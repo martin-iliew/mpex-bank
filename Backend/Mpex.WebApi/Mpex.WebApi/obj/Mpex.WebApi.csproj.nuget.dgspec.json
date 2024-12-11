@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Martin\\Documents\\Projects\\mpex-bank\\Backend\\Mpex.WebApi\\Mpex.WebApi\\Mpex.WebApi.csproj": {}
+    "C:\\Users\\Martin\\Documents\\Projects\\mpex-bank\\backend\\Mpex.WebApi\\Mpex.WebApi\\Mpex.WebApi.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Martin\\Documents\\Projects\\mpex-bank\\Backend\\Mpex.WebApi\\Mpex.WebApi\\Mpex.WebApi.csproj": {
+    "C:\\Users\\Martin\\Documents\\Projects\\mpex-bank\\backend\\Mpex.WebApi\\Mpex.WebApi\\Mpex.WebApi.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Martin\\Documents\\Projects\\mpex-bank\\Backend\\Mpex.WebApi\\Mpex.WebApi\\Mpex.WebApi.csproj",
+        "projectUniqueName": "C:\\Users\\Martin\\Documents\\Projects\\mpex-bank\\backend\\Mpex.WebApi\\Mpex.WebApi\\Mpex.WebApi.csproj",
         "projectName": "Mpex.WebApi",
-        "projectPath": "C:\\Users\\Martin\\Documents\\Projects\\mpex-bank\\Backend\\Mpex.WebApi\\Mpex.WebApi\\Mpex.WebApi.csproj",
+        "projectPath": "C:\\Users\\Martin\\Documents\\Projects\\mpex-bank\\backend\\Mpex.WebApi\\Mpex.WebApi\\Mpex.WebApi.csproj",
         "packagesPath": "C:\\Users\\Martin\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Martin\\Documents\\Projects\\mpex-bank\\Backend\\Mpex.WebApi\\Mpex.WebApi\\obj\\",
+        "outputPath": "C:\\Users\\Martin\\Documents\\Projects\\mpex-bank\\backend\\Mpex.WebApi\\Mpex.WebApi\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

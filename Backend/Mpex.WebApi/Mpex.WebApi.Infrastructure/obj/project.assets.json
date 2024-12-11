@@ -298,11 +298,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Martin\\Documents\\Projects\\mpex-bank\\Backend\\Mpex.WebApi\\Mpex.WebApi.Infrastructure\\Mpex.WebApi.Infrastructure.csproj",
+      "projectUniqueName": "C:\\Users\\Martin\\Documents\\Projects\\mpex-bank\\backend\\Mpex.WebApi\\Mpex.WebAPI.Infrastructure\\Mpex.WebApi.Infrastructure.csproj",
       "projectName": "Mpex.WebApi.Infrastructure",
-      "projectPath": "C:\\Users\\Martin\\Documents\\Projects\\mpex-bank\\Backend\\Mpex.WebApi\\Mpex.WebApi.Infrastructure\\Mpex.WebApi.Infrastructure.csproj",
+      "projectPath": "C:\\Users\\Martin\\Documents\\Projects\\mpex-bank\\backend\\Mpex.WebApi\\Mpex.WebAPI.Infrastructure\\Mpex.WebApi.Infrastructure.csproj",
       "packagesPath": "C:\\Users\\Martin\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Martin\\Documents\\Projects\\mpex-bank\\Backend\\Mpex.WebApi\\Mpex.WebApi.Infrastructure\\obj\\",
+      "outputPath": "C:\\Users\\Martin\\Documents\\Projects\\mpex-bank\\backend\\Mpex.WebApi\\Mpex.WebAPI.Infrastructure\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
