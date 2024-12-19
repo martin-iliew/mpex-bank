@@ -21,7 +21,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Data", "Data", "{FFE762F6-5
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{BE5C95ED-99DC-4DA6-BE5D-3ECDC427AAE9}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WebApi", "WebApi", "{32652BD6-0105-4F42-87C4-CB64148B0288}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Web", "Web", "{32652BD6-0105-4F42-87C4-CB64148B0288}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

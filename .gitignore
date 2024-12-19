@@ -494,3 +494,8 @@ $RECYCLE.BIN/
 /Mpex.WebApi/Mpex.WebApi.Infrastructure/obj/Debug/net8.0/Mpex.WebApi.Infrastructure.assets.cache
 /Mpex.WebApi/Mpex.WebApi.Infrastructure/obj/Debug/net8.0/Mpex.WebApi.Infrastructure.csproj.AssemblyReference.cache
 /Mpex.WebApi/Mpex.WebApi.Infrastructure/obj/Debug/net8.0/Mpex.WebApi.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
+
+.nx/installation
+.nx/cache
+.nx/workspace-data
+vite.config.*.timestamp*
