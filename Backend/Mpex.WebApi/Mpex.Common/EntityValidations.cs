@@ -11,14 +11,14 @@
             public const int LastNameMaxLength = 100;
 
             public const int ImageUrlMaxLength = 2048;
-
         }
-        public static class GeneralApplicationConstants
+        public static class Admin
         {
             public const string AdminRoleName = "Administrator";
-            public const string DevelopmentAdminEmail = "admin@boardtschek.com";
-
             public const string AdminAreaName = "Admin";
+            public const string NormalizedAreaName = "ADMIN";
+            public const string DevelopmentAdminEmail = "admin@mpex.com";
+            public const string NormalizedDevelopmentAdminEmail = "ADMIN@MPEX.COM";
         }
     }
 }

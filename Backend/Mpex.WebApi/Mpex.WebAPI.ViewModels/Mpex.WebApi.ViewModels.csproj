@@ -7,10 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNet.WebApi.Cors" Version="5.3.0" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Mpex.Common\Mpex.Common.csproj" />
   </ItemGroup>
 

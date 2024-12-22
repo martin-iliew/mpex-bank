@@ -68,7 +68,6 @@ namespace Mpex.WebApi.Controllers
                 return Unauthorized("Invalid credentials!");
             }
 
-            // Generate JWT Token
             var authClaims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, user.UserName),
@@ -76,17 +75,13 @@ namespace Mpex.WebApi.Controllers
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 
-            // Add user roles to claims
             var userRoles = await _userManager.GetRolesAsync(user);
             foreach (var role in userRoles)
             {
                 authClaims.Add(new Claim(ClaimTypes.Role, role));
             }
 
-            // Generate access token
             var accessToken = GenerateJwtToken(authClaims);
-
-            // Generate refresh token
             var refreshToken = GenerateRefreshToken();
 
             // Set the refresh token in an HttpOnly cookie

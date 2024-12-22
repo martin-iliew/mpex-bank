@@ -9,6 +9,7 @@ namespace Mpex.Data
     {
         public MpexDbContext(DbContextOptions<MpexDbContext> options) : base(options)
         {
+
         }
     }
 }
