@@ -1,15 +1,12 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Mpex.Data.Models;
 using Mpex.Services.Interfaces;
 using Mpex.WebApi.ViewModels.User;
-using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Mpex.WebApi.Controllers
 {
@@ -20,13 +17,13 @@ namespace Mpex.WebApi.Controllers
         private readonly UserManager<AppUser> _userManager;
         private readonly SignInManager<AppUser> _signInManager;
         private readonly IConfiguration _configuration;
-        private readonly IUserService userService;
+        private readonly IUserService _userService;
 
         public AuthController(UserManager<AppUser> userManager,SignInManager<AppUser> signInManager, IUserService userService, IConfiguration configuration)
         {
             _userManager = userManager;
             _signInManager = signInManager;
-            this.userService = userService;
+            _userService = userService;
             _configuration = configuration;
         }
 
@@ -72,6 +69,7 @@ namespace Mpex.WebApi.Controllers
             {
                 new Claim(ClaimTypes.Name, user.UserName),
                 new Claim(ClaimTypes.Email, user.Email),
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 
@@ -87,10 +85,10 @@ namespace Mpex.WebApi.Controllers
             // Set the refresh token in an HttpOnly cookie
             Response.Cookies.Append("refreshToken", refreshToken, new CookieOptions
             {
-                HttpOnly = true,    // Ensures the cookie cannot be accessed via JavaScript
-                Secure = true,      // Ensures the cookie is only sent over HTTPS
-                SameSite = SameSiteMode.Strict,  // Protects against CSRF attacks
-                Expires = DateTime.UtcNow.AddDays(7) // Set the expiry time for the refresh token cookie
+                HttpOnly = true,    
+                Secure = true,      
+                SameSite = SameSiteMode.Strict,  
+                Expires = DateTime.UtcNow.AddDays(7) 
             });
 
             return Ok(new
@@ -98,6 +96,30 @@ namespace Mpex.WebApi.Controllers
                 tokenType = "Bearer",
                 accessToken = new JwtSecurityTokenHandler().WriteToken(accessToken),
                 expiresIn = (int)(accessToken.ValidTo - DateTime.UtcNow).TotalSeconds
+            });
+        }
+
+        [HttpPost]
+        [Route("refresh-token")]
+        public IActionResult RefreshToken()
+        {
+            var refreshToken = Request.Cookies["refreshToken"];
+
+            if (string.IsNullOrEmpty(refreshToken))
+            {
+                return Unauthorized("No refresh token provided.");
+            }
+            var claims = new List<Claim>
+            {
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            };
+
+            var newAccessToken = GenerateJwtToken(claims);
+            return Ok(new
+            {
+                tokenType = "Bearer",
+                accessToken = new JwtSecurityTokenHandler().WriteToken(newAccessToken),
+                expiresIn = (int)(newAccessToken.ValidTo - DateTime.UtcNow).TotalSeconds
             });
         }
 
