@@ -1,0 +1,6 @@
+@MpexWebApi_HostAddress = http://localhost:5187
+
+GET {{MpexWebApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
