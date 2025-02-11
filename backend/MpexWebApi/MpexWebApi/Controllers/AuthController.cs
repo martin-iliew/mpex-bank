@@ -7,6 +7,7 @@ using System.Security.Claims;
 using System.Text;
 using MpexTestApi.Core.Services.Contracts;
 using MpexWebApi.Core.ViewModels;
+using MpexWebApi.Core.Services.Contracts;
 
 namespace MpexTestApi.Controllers
 {
@@ -18,16 +19,19 @@ namespace MpexTestApi.Controllers
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IConfiguration _configuration;
         private readonly IUserService userService;
+        private readonly IBankAccountService bankAccountService;
 
         public AuthController(UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             IUserService userService,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            IBankAccountService bankAccountService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             this.userService = userService;
             _configuration = configuration;
+            this.bankAccountService = bankAccountService;
         }
 
         [HttpPost]

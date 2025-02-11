@@ -4,6 +4,8 @@ using Microsoft.IdentityModel.Tokens;
 using MpexTestApi.Core.Services.Contracts;
 using MpexTestApi.Infrastructure.Constants.Enums;
 using MpexTestApi.Infrastructure.Data.Models;
+using MpexWebApi.Core.Services;
+using MpexWebApi.Core.Services.Contracts;
 using MpexWebApi.Core.ViewModels;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -16,15 +18,17 @@ namespace MpexTestApi.Core.Services
         private readonly UserManager<ApplicationUser> userManager;
         private readonly IConfiguration config;
         private ApplicationUser user;
+        private readonly IBankAccountService bankAccountService;
 
         private const string loginProvider = "MpexApi";
         private const string refreshToken = "RefreshToken";
 
         public UserService(UserManager<ApplicationUser> userManager,
-            IConfiguration config)
+            IConfiguration config, IBankAccountService bankAccountService)
         {
             this.userManager = userManager;
             this.config = config;
+            this.bankAccountService = bankAccountService;
         }
         public async Task<IEnumerable<IdentityError>> Register(RegisterInputModel model)
         {
@@ -62,6 +66,8 @@ namespace MpexTestApi.Core.Services
             {
                 await userManager.AddToRoleAsync(user, UserRoleName);
             }
+            //var createBankAccount = await bankAccountService
+            //    .CreateBankAccountAsync(user.Id.ToString(), 1);
 
             return result.Errors;
             
