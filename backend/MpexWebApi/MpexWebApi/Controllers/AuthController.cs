@@ -6,6 +6,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using MpexTestApi.Core.Services.Contracts;
+using MpexWebApi.Core.ViewModels;
 
 namespace MpexTestApi.Controllers
 {
@@ -16,131 +17,81 @@ namespace MpexTestApi.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IConfiguration _configuration;
-        private readonly IUserService _userService;
+        private readonly IUserService userService;
 
-        public AuthController(UserManager<ApplicationUser> userManager, 
-            SignInManager<ApplicationUser> signInManager, 
-            IUserService userService, 
+        public AuthController(UserManager<ApplicationUser> userManager,
+            SignInManager<ApplicationUser> signInManager,
+            IUserService userService,
             IConfiguration configuration)
         {
             _userManager = userManager;
             _signInManager = signInManager;
-            _userService = userService;
+            this.userService = userService;
             _configuration = configuration;
         }
 
-        //[HttpPost]
-        //[Route("register")]
-        //public async Task<IActionResult> Register(RegisterViewModel model)
-        //{
-        //    var user = new ApplicationUser
-        //    {
-        //        UserName = model.Email,
-        //        Email = model.Email,
-        //        FirstName = model.FirstName,
-        //        LastName = model.LastName,
-        //        ImageUrl = model.ImageUrl
-        //    };
-        //    var result = await _userManager.CreateAsync(user, model.Password);
-        //    if (result.Succeeded)
-        //    {
-        //        return Ok("User was registered successfully!");
-        //    }
-        //    return BadRequest(result.Errors);
-        //}
+        [HttpPost]
+        [Route("register")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> Register(RegisterInputModel model)
+        {
+            var errors = await userService.Register(model);
 
+            if (errors.Any())
+            {
+                foreach (var error in errors)
+                {
+                    ModelState.AddModelError(error.Code, error.Description);
+                }
+                return BadRequest(ModelState);
+            }
+            return Ok("User was registered successfully!");
 
-
-        //[HttpPost]
-        //[Route("login")]
-        //public async Task<IActionResult> Login(LoginViewModel model)
-        //{
-        //    var user = await _userManager.FindByEmailAsync(model.Email);
-        //    if (user == null)
-        //    {
-        //        return Unauthorized("Invalid credentials!");
-        //    }
-
-        //    var result = await _signInManager.CheckPasswordSignInAsync(user, model.Password, false);
-        //    if (!result.Succeeded)
-        //    {
-        //        return Unauthorized("Invalid credentials!");
-        //    }
-
-        //    var authClaims = new List<Claim>
-        //    {
-        //        new Claim(ClaimTypes.Name, user.UserName),
-        //        new Claim(ClaimTypes.Email, user.Email),
-        //        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-        //        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-        //    };
-
-        //    var userRoles = await _userManager.GetRolesAsync(user);
-        //    foreach (var role in userRoles)
-        //    {
-        //        authClaims.Add(new Claim(ClaimTypes.Role, role));
-        //    }
-
-        //    var accessToken = GenerateJwtToken(authClaims);
-        //    var refreshToken = GenerateRefreshToken();
-
-        //    // Set the refresh token in an HttpOnly cookie
-        //    Response.Cookies.Append("refreshToken", refreshToken, new CookieOptions
-        //    {
-        //        HttpOnly = true,
-        //        Secure = true,
-        //        SameSite = SameSiteMode.Strict,
-        //        Expires = DateTime.UtcNow.AddDays(7)
-        //    });
-
-        //    return Ok(new
-        //    {
-        //        tokenType = "Bearer",
-        //        accessToken = new JwtSecurityTokenHandler().WriteToken(accessToken),
-        //        expiresIn = (int)(accessToken.ValidTo - DateTime.UtcNow).TotalSeconds
-        //    });
-        //}
+        }
 
         [HttpPost]
-        [Route("refresh-token")]
-        public IActionResult RefreshToken()
+        [Route("login")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> Login([FromBody] LoginInputModel model)
         {
-            var refreshToken = Request.Cookies["refreshToken"];
+            var authResponse = await userService.Login(model);
 
-            if (string.IsNullOrEmpty(refreshToken))
+            if (authResponse == null)
             {
-                return Unauthorized("No refresh token provided.");
+                return Unauthorized();
             }
-            var claims = new List<Claim>
+            Response.Cookies.Append("refreshToken", authResponse.RefreshToken, new CookieOptions
             {
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-            };
-
-            var newAccessToken = GenerateJwtToken(claims);
-            return Ok(new
-            {
-                tokenType = "Bearer",
-                accessToken = new JwtSecurityTokenHandler().WriteToken(newAccessToken),
-                expiresIn = (int)(newAccessToken.ValidTo - DateTime.UtcNow).TotalSeconds
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTime.UtcNow.AddDays(7)
             });
+            return Ok(authResponse);
         }
 
-        private JwtSecurityToken GenerateJwtToken(IEnumerable<Claim> authClaims)
-        {
-            var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:SecretKey"]));
 
-            return new JwtSecurityToken(
-                issuer: _configuration["Jwt:Issuer"],
-                audience: _configuration["Jwt:Audience"],
-                expires: DateTime.Now.AddMinutes(30),
-                claims: authClaims,
-                signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
-            );
-        }
-
-        private string GenerateRefreshToken()
+        [HttpPost]
+        [Route("refreshToken")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> RefreshToken([FromBody] AuthResponseViewModel request)
         {
-            return Guid.NewGuid().ToString();
+            var authResponse = await userService.VerifyRefreshToken(request);
+
+            if (authResponse == null)
+            {
+                return Unauthorized();
+            }
+
+            return Ok(authResponse);
         }
     }
 }
