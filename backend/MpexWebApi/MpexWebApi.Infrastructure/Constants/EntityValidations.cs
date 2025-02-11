@@ -10,6 +10,8 @@ namespace MpexTestApi.Infrastructure.Constants
     {
         public static class ApplicationUser
         {
+            public const string UserRoleName = "User";
+            public const string UserAreaName = "User";
         }
         public static class Admin
         {
