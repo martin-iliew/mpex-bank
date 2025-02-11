@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using MpexTestApi.Infrastructure.Constants.Enums;
+using MpexWebApi.Infrastructure.Data.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,5 +26,7 @@ namespace MpexTestApi.Infrastructure.Data.Models
         public DateTime UpdatedAt { get; set; }
 
         public virtual UserProfile? UserProfile { get; set; }
+
+        public virtual IEnumerable<BankAccount> BankAccounts { get; set; } = new List<BankAccount>();
     }
 }
