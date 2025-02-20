@@ -9,9 +9,9 @@ namespace MpexWebApi.Core.Services.Contracts
 {
     public interface IBankAccountService
     {
-        Task<BankAccount> CreateBankAccountAsync(string userId, int accountPlan);
+        Task<BankAccount?> CreateBankAccountAsync(string userId, int accountPlan, int accountType);
 
-        Task<Card> CreateCardAsync(string bankAccountId);
+        Task<Card?> CreateCardAsync(string bankAccountId);
 
         Task<bool> FreezeCard(string cardId);
 
@@ -19,9 +19,9 @@ namespace MpexWebApi.Core.Services.Contracts
 
         Task<bool> Withdraw(string bankAccountId, string userId, decimal amount);
 
-        Task TransferToIBAN(string bankAccountId, string senderId, string receiverIBAN, decimal amount);
+        Task<bool> TransferToIBAN(string bankAccountId, string senderId, string receiverIBAN, decimal amount);
 
-        Task TransferBetweenOwnAccounts(string bankAccountId, string senderId, string receiverIBAN, decimal amount);
+        Task<bool> TransferBetweenOwnAccounts(string senderAccountId, string receiverAccountId, string userId, decimal amount);
         
         Task<bool> DisableBankAccount(string userId, string bankAccountId);
     }

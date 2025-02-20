@@ -1,4 +1,6 @@
-﻿using MpexWebApi.Core.Services.Contracts;
+﻿using CarApp.Infrastructure.Data.Repositories.Interfaces;
+using MpexWebApi.Core.Services.Contracts;
+using MpexWebApi.Infrastructure.Constants.Enums;
 using MpexWebApi.Infrastructure.Data.Models;
 using System;
 using System.Collections.Generic;
@@ -10,9 +12,32 @@ namespace MpexWebApi.Core.Services
 {
     public class BankAccountService : IBankAccountService
     {
-        public Task<BankAccount> CreateBankAccountAsync(string userId, int accountPlan)
+        private readonly IRepository<BankAccount, Guid> bankAccountRepository;
+        public BankAccountService(IRepository<BankAccount, Guid> bankAccountRepository)
         {
-            throw new NotImplementedException();
+            this.bankAccountRepository = bankAccountRepository;
+        }
+
+        public async Task<BankAccount?> CreateBankAccountAsync(string userId, int accountPlan, int accountType)
+        {
+            if(!Guid.TryParse(userId, out Guid userIdGuid))
+            {
+                return null;
+            }
+
+            var newBankAccount = new BankAccount
+            {
+                Id = Guid.NewGuid(),
+                UserId = userIdGuid,
+                AccountPlan = (AccountPlans)accountPlan,
+                Balance = 0m,
+                CreatedAt = DateTime.UtcNow,
+                AccountType = (AccountTypes)accountType,
+                IBAN = "qweqweqweqweqw"
+            };
+
+            await bankAccountRepository.AddAsync(newBankAccount);
+            return newBankAccount;
         }
 
         public Task<Card> CreateCardAsync(string bankAccountId)
@@ -35,12 +60,12 @@ namespace MpexWebApi.Core.Services
             throw new NotImplementedException();
         }
 
-        public Task TransferBetweenOwnAccounts(string bankAccountId, string senderId, string receiverIBAN, decimal amount)
+        public Task<bool> TransferBetweenOwnAccounts(string senderAccountId, string receiverAccountId, string userId, decimal amount)
         {
             throw new NotImplementedException();
         }
 
-        public Task TransferToIBAN(string bankAccountId, string senderId, string receiverIBAN, decimal amount)
+        public Task<bool> TransferToIBAN(string bankAccountId, string senderId, string receiverIBAN, decimal amount)
         {
             throw new NotImplementedException();
         }

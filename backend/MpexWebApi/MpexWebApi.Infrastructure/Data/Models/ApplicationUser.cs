@@ -15,7 +15,6 @@ namespace MpexTestApi.Infrastructure.Data.Models
         {
             Id = Guid.NewGuid();
         }
-        public string PhoneNmber { get; set; } = null!;
 
         public AccountStatus AccountStatus { get; set; }
 

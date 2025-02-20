@@ -8,6 +8,7 @@ using System.Text;
 using MpexTestApi.Core.Services.Contracts;
 using MpexWebApi.Core.ViewModels;
 using MpexWebApi.Core.Services.Contracts;
+using MpexTestApi.Extensions;
 
 namespace MpexTestApi.Controllers
 {
@@ -51,6 +52,7 @@ namespace MpexTestApi.Controllers
                 }
                 return BadRequest(ModelState);
             }
+
             return Ok("User was registered successfully!");
 
         }
