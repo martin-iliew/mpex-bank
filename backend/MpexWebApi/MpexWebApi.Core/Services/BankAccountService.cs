@@ -35,12 +35,12 @@ namespace MpexWebApi.Core.Services
             throw new NotImplementedException();
         }
 
-        public Task TransferBetweenOwnAccounts(string bankAccountId, string senderId, string receiverIBAN, decimal amount)
+        public Task<bool> TransferBetweenOwnAccounts(string senderAccountId, string receiverAccountId, string userId, decimal amount)
         {
             throw new NotImplementedException();
         }
 
-        public Task TransferToIBAN(string bankAccountId, string senderId, string receiverIBAN, decimal amount)
+        public Task<bool> TransferToIBAN(string bankAccountId, string senderId, string receiverIBAN, decimal amount)
         {
             throw new NotImplementedException();
         }

@@ -19,9 +19,9 @@ namespace MpexWebApi.Core.Services.Contracts
 
         Task<bool> Withdraw(string bankAccountId, string userId, decimal amount);
 
-        Task TransferToIBAN(string bankAccountId, string senderId, string receiverIBAN, decimal amount);
+        Task<bool> TransferToIBAN(string bankAccountId, string senderId, string receiverIBAN, decimal amount);
 
-        Task TransferBetweenOwnAccounts(string bankAccountId, string senderId, string receiverIBAN, decimal amount);
+        Task<bool> TransferBetweenOwnAccounts(string senderAccountId, string receiverAccountId, string userId, decimal amount);
         
         Task<bool> DisableBankAccount(string userId, string bankAccountId);
     }
