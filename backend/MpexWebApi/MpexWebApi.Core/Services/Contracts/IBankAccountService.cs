@@ -9,9 +9,9 @@ namespace MpexWebApi.Core.Services.Contracts
 {
     public interface IBankAccountService
     {
-        Task<BankAccount> CreateBankAccountAsync(string userId, int accountPlan);
+        Task<BankAccount?> CreateBankAccountAsync(string userId, int accountPlan, int accountType);
 
-        Task<Card> CreateCardAsync(string bankAccountId);
+        Task<Card?> CreateCardAsync(string bankAccountId);
 
         Task<bool> FreezeCard(string cardId);
 

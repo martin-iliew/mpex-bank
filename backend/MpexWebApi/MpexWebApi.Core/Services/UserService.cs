@@ -42,7 +42,7 @@ namespace MpexTestApi.Core.Services
                 };
             }
 
-            var user = new ApplicationUser
+            ApplicationUser user = new ApplicationUser
             {
                 UserName = model.Email,
                 Email = model.Email,
@@ -66,8 +66,7 @@ namespace MpexTestApi.Core.Services
             {
                 await userManager.AddToRoleAsync(user, UserRoleName);
             }
-            //var createBankAccount = await bankAccountService
-            //    .CreateBankAccountAsync(user.Id.ToString(), 0);
+            await bankAccountService.CreateBankAccountAsync(user.Id.ToString(), 0, 0);
 
             return result.Errors;
             
