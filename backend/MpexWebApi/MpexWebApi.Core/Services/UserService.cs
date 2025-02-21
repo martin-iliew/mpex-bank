@@ -94,7 +94,7 @@ namespace MpexTestApi.Core.Services
         public async Task<string> GenerateToken()
         {
             var securityKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(config["JwtSettings:Key"]!));
+                Encoding.UTF8.GetBytes(config["JwtSettings:SecretKey"]!));
 
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
@@ -104,10 +104,10 @@ namespace MpexTestApi.Core.Services
 
             var claims = new List<Claim>
             {
+                new Claim("uid", user.Id.ToString()),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
-                new Claim(JwtRegisteredClaimNames.Email, user.Email),
-                new Claim("uid", user.Id.ToString()),
+                new Claim(JwtRegisteredClaimNames.Email, user.Email)
             }
             .Union(userClaims).Union(roleClaims);
 

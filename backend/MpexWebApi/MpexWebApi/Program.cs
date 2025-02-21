@@ -9,11 +9,12 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddApplicationServices();
 builder.Services.AddApplicationDbContext(builder.Configuration);
 builder.Services.AddApplicationIdentity(builder.Configuration);
 
 builder.Services.AddJwtAuthentication(builder.Configuration);
+
+builder.Services.AddApplicationServices();
 
 
 builder.Services.AddCors(options =>

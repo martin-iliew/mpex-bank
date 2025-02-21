@@ -1,9 +1,12 @@
 ﻿using CarApp.Infrastructure.Data.Repositories.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using MpexWebApi.Core.Services.Contracts;
+using MpexWebApi.Core.ViewModels.BankAccount;
 using MpexWebApi.Infrastructure.Constants.Enums;
 using MpexWebApi.Infrastructure.Data.Models;
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -58,6 +61,26 @@ namespace MpexWebApi.Core.Services
         public Task<bool> FreezeCard(string cardId)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<BankAccountViewModel?> GetBankAccountAsync(Guid bankAccountId)
+        {
+            var model = await bankAccountRepository
+                .GetAllAttached()
+                .Where(ba => ba.Id.ToString() == bankAccountId.ToString())
+                .Select(ba => new BankAccountViewModel()
+                {
+                    Id = ba.Id.ToString(),
+                    UserId = ba.UserId.ToString(),
+                    IBAN = ba.IBAN,
+                    Balance = ba.Balance,
+                    AccountType = Enum.GetName(ba.AccountType),
+                    //Cards = ba.Cards
+                })
+                .AsNoTracking()
+                .FirstOrDefaultAsync();
+
+            return model;
         }
 
         public Task<bool> TransferBetweenOwnAccounts(string senderAccountId, string receiverAccountId, string userId, decimal amount)

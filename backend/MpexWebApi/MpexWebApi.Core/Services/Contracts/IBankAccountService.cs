@@ -1,4 +1,5 @@
-﻿using MpexWebApi.Infrastructure.Data.Models;
+﻿using MpexWebApi.Core.ViewModels.BankAccount;
+using MpexWebApi.Infrastructure.Data.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,7 @@ namespace MpexWebApi.Core.Services.Contracts
 {
     public interface IBankAccountService
     {
+        Task<BankAccountViewModel?> GetBankAccountAsync(Guid bankAccountId);
         Task<BankAccount?> CreateBankAccountAsync(string userId, int accountPlan, int accountType);
 
         Task<Card?> CreateCardAsync(string bankAccountId);

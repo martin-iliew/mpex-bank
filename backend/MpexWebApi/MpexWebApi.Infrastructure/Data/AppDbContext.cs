@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using MpexTestApi.Infrastructure.Data.Models;
+using MpexWebApi.Infrastructure.Constants.Enums;
+using MpexWebApi.Infrastructure.Data.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,7 +20,10 @@ namespace MpexTestApi.Infrastructure.Data
         {
             
         }
-                 
+         
+        public DbSet<BankAccount> BankAccounts { get; set; }
+        public DbSet<Card> Cards { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);

@@ -72,6 +72,7 @@ namespace MpexTestApi.Extensions
             services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
             {
                 options.SignIn.RequireConfirmedAccount = false;
+                options.SignIn.RequireConfirmedEmail = false;
                 options.Password.RequireNonAlphanumeric = false;
                 options.Password.RequireUppercase = false;
                 options.Password.RequireLowercase = false;
@@ -88,7 +89,7 @@ namespace MpexTestApi.Extensions
 
         public static void RegisterRepositories(this IServiceCollection services, Assembly modelsAssembly)
         {
-            Type[] typesToExclude = new Type[] { typeof(ApplicationUser), typeof(AccountPlans) };
+            Type[] typesToExclude = new Type[] { typeof(ApplicationUser), typeof(UserProfile), typeof(AccountPlans) };
 
             Type[] modelsType = modelsAssembly
                 .GetTypes()
