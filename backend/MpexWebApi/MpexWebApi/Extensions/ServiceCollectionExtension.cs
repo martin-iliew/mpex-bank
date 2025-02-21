@@ -89,7 +89,7 @@ namespace MpexTestApi.Extensions
 
         public static void RegisterRepositories(this IServiceCollection services, Assembly modelsAssembly)
         {
-            Type[] typesToExclude = new Type[] { typeof(ApplicationUser), typeof(AccountPlans) };
+            Type[] typesToExclude = new Type[] { typeof(ApplicationUser), typeof(UserProfile), typeof(AccountPlans) };
 
             Type[] modelsType = modelsAssembly
                 .GetTypes()

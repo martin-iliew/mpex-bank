@@ -6,6 +6,7 @@ using MpexWebApi.Infrastructure.Constants.Enums;
 using MpexWebApi.Infrastructure.Data.Models;
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -66,15 +67,17 @@ namespace MpexWebApi.Core.Services
         {
             var model = await bankAccountRepository
                 .GetAllAttached()
-                .Where(ba => ba.Id == bankAccountId)
+                .Where(ba => ba.Id.ToString() == bankAccountId.ToString())
                 .Select(ba => new BankAccountViewModel()
                 {
-                    Id = ba.Id,
+                    Id = ba.Id.ToString(),
+                    UserId = ba.UserId.ToString(),
                     IBAN = ba.IBAN,
                     Balance = ba.Balance,
                     AccountType = Enum.GetName(ba.AccountType),
                     //Cards = ba.Cards
                 })
+                .AsNoTracking()
                 .FirstOrDefaultAsync();
 
             return model;
