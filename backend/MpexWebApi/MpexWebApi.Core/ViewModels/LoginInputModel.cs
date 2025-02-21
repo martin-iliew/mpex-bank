@@ -11,10 +11,10 @@ namespace MpexWebApi.Core.ViewModels
     public class LoginInputModel
     {
         [Required]
-        public string Email { get; set; } = null!;
+        public string Email { get; set; }
 
         [Required]
         [StringLength(6, MinimumLength = 4)]
-        public string Password { get; set; } = null!;
+        public string Password { get; set; }
     }
 }

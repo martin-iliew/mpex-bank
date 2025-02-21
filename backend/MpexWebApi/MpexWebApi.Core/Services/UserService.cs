@@ -94,7 +94,7 @@ namespace MpexTestApi.Core.Services
         public async Task<string> GenerateToken()
         {
             var securityKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(config["JwtSettings:Key"]!));
+                Encoding.UTF8.GetBytes(config["JwtSettings:SecretKey"]!));
 
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 

@@ -72,6 +72,7 @@ namespace MpexTestApi.Extensions
             services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
             {
                 options.SignIn.RequireConfirmedAccount = false;
+                options.SignIn.RequireConfirmedEmail = false;
                 options.Password.RequireNonAlphanumeric = false;
                 options.Password.RequireUppercase = false;
                 options.Password.RequireLowercase = false;
