@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -32,18 +33,20 @@ namespace MpexWebApi.Core.Services
             {
                 Id = Guid.NewGuid(),
                 UserId = userIdGuid,
+                AccountNumber = GenerateAccountNumber(),
                 AccountPlan = (AccountPlans)accountPlan,
                 Balance = 0m,
                 CreatedAt = DateTime.UtcNow,
-                AccountType = (AccountTypes)accountType,
-                IBAN = "qweqweqweqweqw"
+                AccountType = (AccountTypes)accountType
             };
+
+            newBankAccount.IBAN = GenerateIBAN(newBankAccount.AccountNumber);
 
             await bankAccountRepository.AddAsync(newBankAccount);
             return newBankAccount;
         }
 
-        public Task<Card> CreateCardAsync(string bankAccountId)
+        public Task<Card?> CreateCardAsync(string bankAccountId)
         {
             throw new NotImplementedException();
         }
@@ -96,6 +99,52 @@ namespace MpexWebApi.Core.Services
         public Task<bool> Withdraw(string bankAccountId, string userId, decimal amount)
         {
             throw new NotImplementedException();
+        }
+
+
+        public string GenerateAccountNumber()
+        {
+            Random random = new Random();
+            string accountNumber;
+
+            do
+            {
+                // Generate a random 12-digit number
+                accountNumber = random.NextInt64(100000000000, 999999999999).ToString("D12");
+            } while (bankAccountRepository.GetAllAttached()
+            .Any(account => account.AccountNumber == accountNumber));
+
+            return accountNumber;
+        }
+
+        public string GenerateIBAN(string accountNumber)
+        {
+            const string countryCode = "BG";
+            const string bankCode = "MPEX";
+
+            // Construct the initial IBAN structure: BG + check digits + bank code + account number
+            string ibanWithoutCheckDigits = countryCode + "00" + bankCode + accountNumber;
+
+            // Calculate the check digits for the IBAN
+            string ibanForCheck = ibanWithoutCheckDigits + "131400"; // '131400' represents the numeric value of "BG"
+            int checkDigits = Mod97(ibanForCheck);
+
+            // Replace the placeholder check digits with the calculated check digits
+            string iban = countryCode + checkDigits.ToString("D2") + bankCode + accountNumber;
+
+            return iban;
+        }
+
+        // Mod97 algorithm to calculate IBAN check digits
+        private int Mod97(string iban)
+        {
+            // Convert the string to a numeric value
+            string ibanAsNumeric = string.Concat(iban
+                .Select(c => char.IsLetter(c) ? (c - 'A' + 10).ToString() : c.ToString()));
+
+            // Perform Mod97 on the numeric value
+            BigInteger numericValue = BigInteger.Parse(ibanAsNumeric);
+            return (int)(numericValue % 97);
         }
     }
 }
