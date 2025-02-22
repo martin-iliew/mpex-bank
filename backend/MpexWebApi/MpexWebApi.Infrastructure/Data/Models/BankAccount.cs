@@ -16,7 +16,7 @@ namespace MpexWebApi.Infrastructure.Data.Models
         public Guid UserId { get; set; }
         [ForeignKey(nameof(UserId))]
         public ApplicationUser ApplicationUser { get; set; }
-
+        public string AccountNumber { get; set; }
         public AccountPlans AccountPlan { get; set; }
         public string IBAN { get; set; }
         

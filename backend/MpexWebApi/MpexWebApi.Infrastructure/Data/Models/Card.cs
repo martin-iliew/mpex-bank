@@ -15,6 +15,8 @@ namespace MpexWebApi.Infrastructure.Data.Models
 
         public string CardNumber { get; set; }
 
+        public string CVV { get; set; }
+
         public Guid BankAccountId { get; set; }
         [ForeignKey(nameof(BankAccountId))]
         public BankAccount BankAccount { get; set; }

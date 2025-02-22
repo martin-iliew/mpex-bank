@@ -62,11 +62,13 @@ namespace MpexTestApi.Core.Services
 
             var result = await userManager.CreateAsync(user, model.Password);
 
-            if(result.Succeeded)
+            if (result.Succeeded)
             {
                 await userManager.AddToRoleAsync(user, UserRoleName);
             }
+
             await bankAccountService.CreateBankAccountAsync(user.Id.ToString(), 0, 0);
+
 
             return result.Errors;
             
