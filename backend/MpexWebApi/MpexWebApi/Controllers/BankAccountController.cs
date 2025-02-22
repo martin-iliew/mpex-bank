@@ -5,6 +5,8 @@ using MpexTestApi.Extensions;
 using MpexWebApi.Core.Services;
 using MpexWebApi.Core.Services.Contracts;
 using MpexWebApi.Core.ViewModels.BankAccount;
+using MpexWebApi.Core.ViewModels.Card;
+using MpexWebApi.Infrastructure.Data.Models;
 
 namespace MpexWebApi.Controllers
 {
@@ -19,7 +21,7 @@ namespace MpexWebApi.Controllers
             this.bankAccountService = bankAccountService;
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("bankAccount/{id}")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -50,6 +52,72 @@ namespace MpexWebApi.Controllers
             }
 
             return Ok(bankAccount);
+        }
+
+        [HttpGet("card/{id}")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public async Task<IActionResult> Card(string? id)
+        {
+            Guid cardId = Guid.Empty;
+            bool isIdValid = IsGuidValid(id, ref cardId);
+            if (!isIdValid)
+            {
+                return BadRequest();
+            }
+
+            DebitCardViewModel? card = await bankAccountService
+                .GetCardAsync(cardId);
+
+            if (card == null)
+            {
+                return NotFound();
+            }
+
+            var userId = User.GetId();
+            if (userId == null || card.UserId.ToLower() != userId.ToString().ToLower())
+            {
+                return Forbid();
+            }
+
+            return Ok(card);
+        }
+
+
+        [HttpPost("{bankAccountId}/create-card")]
+        public async Task<IActionResult> CreateCard(string? bankAccountId)
+        {
+            if (!Guid.TryParse(bankAccountId, out var bankAccountGuidId))
+            {
+                return BadRequest();
+            }
+            var bankAccount = await bankAccountService
+                .GetBankAccountAsync(bankAccountGuidId);
+            
+            if (bankAccount == null)
+            {
+                return BadRequest();
+            }
+
+            var userId = User.GetId();
+            if (userId == null || bankAccount.UserId.ToString().ToLower() !=
+                userId.ToString().ToLower())
+            {
+                return Forbid();
+            }
+
+            bool result = await bankAccountService.CreateCardAsync(bankAccountGuidId);
+
+            if (result == false)
+            {
+                return BadRequest();
+            }
+
+            return Ok();
         }
     }
 }
