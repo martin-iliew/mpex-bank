@@ -5,15 +5,9 @@ using MpexWebApi.Core.ViewModels.BankAccount;
 using MpexWebApi.Core.ViewModels.Card;
 using MpexWebApi.Infrastructure.Constants.Enums;
 using MpexWebApi.Infrastructure.Data.Models;
-using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Numerics;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace MpexWebApi.Core.Services
 {

@@ -13,7 +13,7 @@ namespace MpexWebApi.Controllers
     [Route("api/[controller]")]
     [Authorize]
     [ApiController]
-    public class BankAccountController : BaseController
+    public class BankAccountController : ControllerBase
     {
         private readonly IBankAccountService bankAccountService;
         public BankAccountController(IBankAccountService bankAccountService) 
@@ -30,9 +30,8 @@ namespace MpexWebApi.Controllers
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<IActionResult> BankAccount(string? id)
         {
-            Guid bankAccountGuidId = Guid.Empty;
-            bool isIdValid = IsGuidValid(id, ref bankAccountGuidId);
-            if (!isIdValid)
+
+            if (!Guid.TryParse(id, out Guid bankAccountGuidId))
             {
                 return BadRequest();
             }
@@ -63,9 +62,7 @@ namespace MpexWebApi.Controllers
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<IActionResult> Card(string? id)
         {
-            Guid cardId = Guid.Empty;
-            bool isIdValid = IsGuidValid(id, ref cardId);
-            if (!isIdValid)
+            if (!Guid.TryParse(id, out Guid cardId))
             {
                 return BadRequest();
             }
@@ -91,7 +88,7 @@ namespace MpexWebApi.Controllers
         [HttpPost("{bankAccountId}/create-card")]
         public async Task<IActionResult> CreateCard(string? bankAccountId)
         {
-            if (!Guid.TryParse(bankAccountId, out var bankAccountGuidId))
+            if (!Guid.TryParse(bankAccountId, out Guid bankAccountGuidId))
             {
                 return BadRequest();
             }
