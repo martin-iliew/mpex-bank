@@ -112,9 +112,16 @@ namespace MpexWebApi.Core.Services
             return model;
         }
 
-        public Task<bool> Deposit(string bankAccountId, string userId, decimal amount)
+        public async Task<bool> Deposit(Guid bankAccountId, decimal amount)
         {
-            throw new NotImplementedException();
+            var bankAccount = await bankAccountRepository.GetByIdAsync(bankAccountId);
+            if(bankAccount == null)
+            {
+                return false;
+            }
+            bankAccount.Balance += amount;
+            await bankAccountRepository.UpdateAsync(bankAccount);
+            return true;
         }
 
         public Task<bool> DisableBankAccount(string userId, string bankAccountId)
