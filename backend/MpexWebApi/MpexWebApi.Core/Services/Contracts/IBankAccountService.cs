@@ -11,6 +11,7 @@ namespace MpexWebApi.Core.Services.Contracts
 {
     public interface IBankAccountService
     {
+        Task<IEnumerable<AllBankAccountViewModel?>> GetAllBankAccountAsync(Guid UserId);
         Task<BankAccountViewModel?> GetBankAccountAsync(Guid bankAccountId);
         Task<BankAccount?> CreateBankAccountAsync(string userId, int accountPlan, int accountType);
 

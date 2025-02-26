@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using MpexTestApi.Extensions;
 using MpexWebApi.Core.Services;
@@ -21,7 +22,7 @@ namespace MpexWebApi.Controllers
             this.bankAccountService = bankAccountService;
         }
 
-        [HttpGet("bankAccount/{id}")]
+        [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -51,6 +52,33 @@ namespace MpexWebApi.Controllers
             }
 
             return Ok(bankAccount);
+        }
+
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public async Task<IActionResult> AllBankAccounts()
+        {
+
+            var userId = User.GetId();
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+
+            if (!Guid.TryParse(userId, out Guid userIdGuid))
+            {
+                return BadRequest();
+            }
+
+            IEnumerable<AllBankAccountViewModel?> allBankAccounts = await bankAccountService
+                .GetAllBankAccountAsync(userIdGuid);
+
+            return Ok(allBankAccounts);
         }
 
         [HttpGet("card/{id}")]
@@ -114,7 +142,7 @@ namespace MpexWebApi.Controllers
                 return BadRequest();
             }
 
-            return Ok();
+            return Created();
         }
     }
 }
