@@ -5,15 +5,9 @@ using MpexWebApi.Core.ViewModels.BankAccount;
 using MpexWebApi.Core.ViewModels.Card;
 using MpexWebApi.Infrastructure.Constants.Enums;
 using MpexWebApi.Infrastructure.Data.Models;
-using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Numerics;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace MpexWebApi.Core.Services
 {
@@ -27,8 +21,27 @@ namespace MpexWebApi.Core.Services
         {
             this.bankAccountRepository = bankAccountRepository;
             this.cardRepository = cardRepository;
-        }   
+        }
 
+        public async Task<IEnumerable<AllBankAccountViewModel?>> GetAllBankAccountAsync(Guid UserId)
+        {
+            var bankAccounts = await bankAccountRepository
+                .GetAllAttached()
+                .Where(ba => ba.ApplicationUser.Id.Equals(UserId))
+                .Select(ba => new AllBankAccountViewModel()
+                {
+                    Id = ba.Id.ToString(),
+                    UserId = ba.UserId.ToString(),
+                    IBAN = ba.IBAN,
+                    Balance = ba.Balance,
+                    AccountType = ba.AccountType.ToString(),
+                    AccountPlan = ba.AccountPlan.ToString(),
+                    Cards = ba.Cards.Count()
+                })
+                .ToListAsync();
+
+            return bankAccounts;
+        }
         public async Task<BankAccount?> CreateBankAccountAsync(string userId, int accountPlan, int accountType)
         {
             if(!Guid.TryParse(userId, out Guid userIdGuid))
@@ -99,9 +112,16 @@ namespace MpexWebApi.Core.Services
             return model;
         }
 
-        public Task<bool> Deposit(string bankAccountId, string userId, decimal amount)
+        public async Task<bool> Deposit(Guid bankAccountId, decimal amount)
         {
-            throw new NotImplementedException();
+            var bankAccount = await bankAccountRepository.GetByIdAsync(bankAccountId);
+            if(bankAccount == null)
+            {
+                return false;
+            }
+            bankAccount.Balance += amount;
+            await bankAccountRepository.UpdateAsync(bankAccount);
+            return true;
         }
 
         public Task<bool> DisableBankAccount(string userId, string bankAccountId)
@@ -129,7 +149,12 @@ namespace MpexWebApi.Core.Services
                     Cards = ba.Cards.Select(c => new DebitCardViewModel()
                     {
                         Id = c.Id.ToString(),
-                        CardNumber = c.CardNumber,
+                        UserId = c.BankAccount.UserId.ToString(),
+                        CardNumber = Regex.Replace(c.CardNumber, @"(\d{4})(\d{4})(\d{4})(\d{4})", "$1 $2 $3 $4"),
+                        CVV = c.CVV,
+                        CardStatus = c.CardStatus.ToString(),
+                        ExpiaryDate = c.ExpiryDate.ToString("MM/yy", CultureInfo.InvariantCulture),
+                        OwnerName = $"{c.BankAccount.ApplicationUser.UserProfile.FirstName} {c.BankAccount.ApplicationUser.UserProfile.LastName}"
                     }).ToList()
                 })
                 .AsNoTracking()

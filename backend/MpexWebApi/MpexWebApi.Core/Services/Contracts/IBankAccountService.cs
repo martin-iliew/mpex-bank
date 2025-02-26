@@ -11,6 +11,7 @@ namespace MpexWebApi.Core.Services.Contracts
 {
     public interface IBankAccountService
     {
+        Task<IEnumerable<AllBankAccountViewModel?>> GetAllBankAccountAsync(Guid UserId);
         Task<BankAccountViewModel?> GetBankAccountAsync(Guid bankAccountId);
         Task<BankAccount?> CreateBankAccountAsync(string userId, int accountPlan, int accountType);
 
@@ -19,7 +20,7 @@ namespace MpexWebApi.Core.Services.Contracts
 
         Task<bool> FreezeCard(string cardId);
 
-        Task<bool> Deposit(string bankAccountId, string userId, decimal amount);
+        Task<bool> Deposit(Guid bankAccountId, decimal amount);
 
         Task<bool> Withdraw(string bankAccountId, string userId, decimal amount);
 
