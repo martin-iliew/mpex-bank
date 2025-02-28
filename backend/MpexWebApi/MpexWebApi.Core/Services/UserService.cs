@@ -17,7 +17,6 @@ namespace MpexTestApi.Core.Services
     {
         private readonly UserManager<ApplicationUser> userManager;
         private readonly IConfiguration config;
-        private ApplicationUser user;
         private readonly IBankAccountService bankAccountService;
 
         private const string loginProvider = "MpexApi";
@@ -74,26 +73,26 @@ namespace MpexTestApi.Core.Services
             
         }
 
-        public async Task<AuthResponseViewModel> Login(LoginInputModel model)
+        public async Task<AuthResponseViewModel?> Login(LoginInputModel model)
         {
-            user = await userManager.FindByEmailAsync(model.Email);
+            var user = await userManager.FindByEmailAsync(model.Email);
             bool isvalidUser = await userManager.CheckPasswordAsync(user, model.Password);
             if (user == null || isvalidUser == false)
             {
                 return null;
             }
-            var token = await GenerateToken();
+            var token = await GenerateToken(user);
 
             return new AuthResponseViewModel
             {
                 Token = token,
                 UserId = user.Id.ToString(),
-                RefreshToken = await CreateRefreshToken()
+                RefreshToken = await CreateRefreshToken(user)
             };
 
         }
 
-        public async Task<string> GenerateToken()
+        public async Task<string> GenerateToken(ApplicationUser user)
         {
             var securityKey = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(config["JwtSettings:SecretKey"]!));
@@ -111,38 +110,41 @@ namespace MpexTestApi.Core.Services
                 new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
                 new Claim(JwtRegisteredClaimNames.Email, user.Email)
             }
-            .Union(userClaims).Union(roleClaims);
+            .Union(userClaims)
+            .Union(roleClaims);
 
             var token = new JwtSecurityToken(
                 issuer: config["JwtSettings:Issuer"],
                 audience: config["JwtSettings:Audience"],
                 claims: claims,
-                expires: DateTime.Now.AddMinutes(Convert.ToInt32(config["JwtSettings:DurationInMinutes"])),
+                expires: DateTime.UtcNow.AddMinutes(int.Parse(config["JwtSettings:DurationInMinutes"]!)),
                 signingCredentials: credentials
                 );
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        public async Task<string> CreateRefreshToken()
+        public async Task<string> CreateRefreshToken(ApplicationUser user)
         {
             await userManager.RemoveAuthenticationTokenAsync(user, loginProvider, refreshToken);
 
             var newRefreshToken = await userManager.GenerateUserTokenAsync(user, loginProvider,
                 refreshToken);
-            var result = await userManager.SetAuthenticationTokenAsync(user, loginProvider,
-                refreshToken, newRefreshToken);
+
+            await userManager.SetAuthenticationTokenAsync(user, loginProvider, refreshToken, 
+                newRefreshToken);
 
             return newRefreshToken;
         }
 
-        public async Task<AuthResponseViewModel> VerifyRefreshToken(AuthResponseViewModel request)
+        public async Task<AuthResponseViewModel?> VerifyRefreshToken(AuthResponseViewModel request)
         {
-            var jwtSecurityTokenHanfler = new JwtSecurityTokenHandler();
-            var tokenContent = jwtSecurityTokenHanfler.ReadJwtToken(request.Token);
-            var username = tokenContent.Claims.ToList().FirstOrDefault(q => q.Type ==
+            var jwtSecurityTokenHandler = new JwtSecurityTokenHandler();
+            var tokenContent = jwtSecurityTokenHandler.ReadJwtToken(request.Token);
+            var email = tokenContent.Claims.FirstOrDefault(q => q.Type ==
             JwtRegisteredClaimNames.Email)?.Value;
-            user = await userManager.FindByNameAsync(username);
+
+            var user = await userManager.FindByEmailAsync(email);
 
             if(user == null || user.Id.ToString() != request.UserId)
             {
@@ -151,19 +153,19 @@ namespace MpexTestApi.Core.Services
             var isValidRefreshToken = await userManager.VerifyUserTokenAsync(user, loginProvider,
                 refreshToken, request.RefreshToken);
 
-            if (isValidRefreshToken)
+            if (!isValidRefreshToken)
             {
-                var token = await GenerateToken();
-                return new AuthResponseViewModel
-                {
-                    Token = token,
-                    UserId = user.Id.ToString(),
-                    RefreshToken = await CreateRefreshToken()
-                };
+                await userManager.UpdateSecurityStampAsync(user);
+                return null;
             }
 
-            await userManager.UpdateSecurityStampAsync(user);
-            return null;
+            var token = await GenerateToken(user);
+            return new AuthResponseViewModel
+            {
+                Token = token,
+                UserId = user.Id.ToString(),
+                RefreshToken = await CreateRefreshToken(user)
+            };
         }
     }
 }
