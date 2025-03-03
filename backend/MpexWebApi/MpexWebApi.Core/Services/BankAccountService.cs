@@ -82,9 +82,9 @@ namespace MpexWebApi.Core.Services
                 Id = Guid.NewGuid(),
                 BankAccountId = bankAccountId,
                 ExpiryDate = GenerateExpiryDate(),
-                CreatedAt = DateTime.Now,
+                CreatedAt = DateTime.UtcNow,
                 CardStatus = 0,
-                CardNumber = GenerateCardNumber(bankAccount.AccountNumber),
+                CardNumber = GenerateCardNumber(bankAccount.AccountNumber) ?? "xxxxxxxxxxxxxxxx",
                 CVV = GenerateCVV()
             };
             await cardRepository.AddAsync(newCard);
@@ -237,9 +237,9 @@ namespace MpexWebApi.Core.Services
 
         public static DateOnly GenerateExpiryDate()
         {
-            int expiryYear = DateTime.Now.Year + 3;
+            int expiryYear = DateTime.UtcNow.Year + 3;
 
-            int expiryMonth = DateTime.Now.Month;
+            int expiryMonth = DateTime.UtcNow.Month;
 
             DateOnly expiryDate = new DateOnly(expiryYear, expiryMonth, 
                 DateTime.DaysInMonth(expiryYear, expiryMonth));

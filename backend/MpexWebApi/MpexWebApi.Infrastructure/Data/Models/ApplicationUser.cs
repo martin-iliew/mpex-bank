@@ -27,5 +27,9 @@ namespace MpexTestApi.Infrastructure.Data.Models
         public virtual UserProfile? UserProfile { get; set; }
 
         public virtual IEnumerable<BankAccount> BankAccounts { get; set; } = new List<BankAccount>();
+
+        //public string? RefreshToken { get; set; }
+
+        //public DateTime? RefreshTokenExpiry { get; set; }
     }
 }
