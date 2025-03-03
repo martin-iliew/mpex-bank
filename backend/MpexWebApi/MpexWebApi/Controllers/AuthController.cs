@@ -71,13 +71,23 @@ namespace MpexTestApi.Controllers
             {
                 return Unauthorized();
             }
+
             Response.Cookies.Append("refreshToken", authResponse.RefreshToken, new CookieOptions
             {
                 HttpOnly = true,
                 Secure = true,
                 SameSite = SameSiteMode.Strict,
-                Expires = DateTime.UtcNow.AddDays(7)
+                Expires = DateTime.UtcNow.AddDays(1)
             });
+
+            Response.Cookies.Append("Token", authResponse.Token, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTime.UtcNow.AddMinutes(15)
+            });
+
             return Ok(authResponse);
         }
 
@@ -96,7 +106,21 @@ namespace MpexTestApi.Controllers
             {
                 return Unauthorized();
             }
+            Response.Cookies.Append("refreshToken", authResponse.RefreshToken, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTime.UtcNow.AddDays(1)
+            });
 
+            Response.Cookies.Append("Token", authResponse.Token, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTime.UtcNow.AddMinutes(15)
+            });
             return Ok(authResponse);
         }
     }
