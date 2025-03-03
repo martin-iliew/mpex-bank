@@ -64,9 +64,8 @@ namespace MpexTestApi.Core.Services
             if (result.Succeeded)
             {
                 await userManager.AddToRoleAsync(user, UserRoleName);
+                await bankAccountService.CreateBankAccountAsync(user.Id.ToString(), 0, 0);
             }
-
-            await bankAccountService.CreateBankAccountAsync(user.Id.ToString(), 0, 0);
 
 
             return result.Errors;
@@ -76,8 +75,7 @@ namespace MpexTestApi.Core.Services
         public async Task<AuthResponseViewModel?> Login(LoginInputModel model)
         {
             var user = await userManager.FindByEmailAsync(model.Email);
-            bool isvalidUser = await userManager.CheckPasswordAsync(user, model.Password);
-            if (user == null || isvalidUser == false)
+            if (user == null || !await userManager.CheckPasswordAsync(user, model.Password))
             {
                 return null;
             }

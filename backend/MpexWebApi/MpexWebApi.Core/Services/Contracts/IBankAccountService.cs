@@ -22,7 +22,7 @@ namespace MpexWebApi.Core.Services.Contracts
 
         Task<bool> Deposit(Guid bankAccountId, decimal amount);
 
-        Task<bool> Withdraw(string bankAccountId, string userId, decimal amount);
+        Task<bool> WithdrawAsync(Guid bankAccountId, decimal amount);
 
         Task<bool> TransferToIBAN(string bankAccountId, string senderId, string receiverIBAN, decimal amount);
 
