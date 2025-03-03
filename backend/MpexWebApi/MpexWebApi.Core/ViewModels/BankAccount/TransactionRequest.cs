@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MpexWebApi.Core.ViewModels.BankAccount
 {
-    public  class DepositRequest
+    public  class TransactionRequest
     {
         public decimal Amount { get; set; }
     }

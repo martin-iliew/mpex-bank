@@ -153,7 +153,7 @@ namespace MpexWebApi.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        public async Task<IActionResult> Deposit(string bankAccountId, [FromBody] DepositRequest request)
+        public async Task<IActionResult> Deposit(string bankAccountId, [FromBody] TransactionRequest request)
         {
             if (!Guid.TryParse(bankAccountId, out var accountId))
             {
@@ -184,6 +184,45 @@ namespace MpexWebApi.Controllers
             }
 
             return Ok("Deposit successful.");
+        }
+
+        [HttpPost("{bankAccountId}/withdraw")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public async Task<IActionResult> Withdraw(string bankAccountId, [FromBody] TransactionRequest request)
+        {
+            if (!Guid.TryParse(bankAccountId, out var accountId))
+            {
+                return BadRequest();
+            }
+
+            var userId = User.GetId();
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+
+            var bankAccount = await bankAccountService.GetBankAccountAsync(accountId);
+            if (bankAccount == null || bankAccount.UserId.ToLower().ToString() != userId.ToLower())
+            {
+                return Forbid();
+            }
+
+            if (request.Amount <= 0)
+            {
+                return BadRequest();
+            }
+
+            var success = await bankAccountService.WithdrawAsync(accountId, request.Amount);
+            if (!success)
+            {
+                return BadRequest();
+            }
+
+            return Ok("Withdraw successful.");
         }
     }
 }

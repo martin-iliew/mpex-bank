@@ -173,9 +173,23 @@ namespace MpexWebApi.Core.Services
             throw new NotImplementedException();
         }
 
-        public Task<bool> Withdraw(string bankAccountId, string userId, decimal amount)
+        public async Task<bool> WithdrawAsync(Guid bankAccountId, decimal amount)
         {
-            throw new NotImplementedException();
+            var bankAccount = await bankAccountRepository.GetByIdAsync(bankAccountId);
+            if (bankAccount == null)
+            {
+                return false;
+            }
+
+            if (bankAccount.Balance < amount)
+            {
+                return false;
+            }
+
+            bankAccount.Balance -= amount;
+            await bankAccountRepository.UpdateAsync(bankAccount);
+
+            return true;
         }
 
 
