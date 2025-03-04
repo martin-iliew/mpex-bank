@@ -1,6 +1,17 @@
 import { useState, useEffect, ReactNode, useCallback } from "react";
-import { AuthContext } from "./AuthContext";
 import apiClient from "@/api/axios";
+import { AuthContext } from "@/context/AuthContext";
+
+const decodeToken = (token: string) => {
+  const payload = token.split(".")[1];
+  const decoded = JSON.parse(atob(payload));
+  return decoded;
+};
+
+const isTokenExpired = (token: string) => {
+  const decoded = decodeToken(token);
+  return decoded.exp * 1000 < Date.now();
+};
 
 interface AuthProviderProps {
   children: ReactNode;
@@ -17,24 +28,26 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     return null;
   }
 
-  function isTokenExpired(token: string) {
-    const payload = JSON.parse(atob(token.split(".")[1]));
-    const expirationTime = payload.exp * 1000;
-    return Date.now() >= expirationTime;
-  }
+  const fetchUserRole = async () => {
+    try {
+      const response = await apiClient.get("/api/User/info");
+      setUserRole(response.data.role);
+    } catch (error) {
+      console.error("Failed to fetch user role:", error);
+      setUserRole("Guest");
+    }
+  };
 
   const refreshAuthToken = useCallback(async () => {
     const refreshToken = getCookie("refreshToken");
     if (refreshToken) {
       try {
-        const response = await apiClient.post("/api/Auth/refresh-token");
+        const response = await apiClient.post("/api/Auth/refreshToken");
         const { accessToken } = response.data;
-        localStorage.setItem("accessToken", accessToken);
         apiClient.defaults.headers["Authorization"] = `Bearer ${accessToken}`;
         return true;
       } catch (error) {
         console.error("Token refresh failed:", error);
-        document.cookie = "refreshToken=; Max-Age=-99999999; path=/";
         return false;
       }
     }
@@ -42,13 +55,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   }, []);
 
   useEffect(() => {
-    const accessToken =
-      localStorage.getItem("accessToken") || getCookie("accessToken");
+    const accessToken = getCookie("accessToken");
 
     if (accessToken && !isTokenExpired(accessToken)) {
       apiClient.defaults.headers["Authorization"] = `Bearer ${accessToken}`;
       setIsAuthenticated(true);
-      setUserRole("user");
+      fetchUserRole();
     } else {
       const refreshToken = getCookie("refreshToken");
       if (refreshToken) {
@@ -56,7 +68,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           .then((success) => {
             if (success) {
               setIsAuthenticated(true);
-              setUserRole("user");
+              fetchUserRole();
             } else {
               setIsAuthenticated(false);
               setUserRole(null);
@@ -81,8 +93,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const logout = () => {
     setIsAuthenticated(false);
     setUserRole(null);
-    localStorage.removeItem("accessToken");
-    document.cookie = "refreshToken=; Max-Age=-99999999; path=/";
+    document.cookie =
+      "accessToken=; Max-Age=-99999999; path=/; Secure; HttpOnly; SameSite=Strict";
+    document.cookie =
+      "refreshToken=; Max-Age=-99999999; path=/; Secure; HttpOnly; SameSite=Strict";
   };
 
   return (

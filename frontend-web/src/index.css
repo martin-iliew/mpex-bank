@@ -1,10 +1,105 @@
 @import "tailwindcss";
-
 @plugin "tailwindcss-animate";
-
 @custom-variant dark (&:is(.dark *));
 
+/* Primitives */
 :root {
+  --title: "Inter", sans-serif;
+  --body: "Inter", sans-serif;
+  --code: "Roboto Mono", sans-serif;
+
+  --primary-50: #fcd0d0;
+  --primary-100: #fa9898;
+  --primary-200: #f95153;
+  --primary-300: #cf191e;
+  --primary-400: #900e11;
+  --primary-500: #550506;
+  --primary-600: #2b0102;
+  --primary-700: #1a0000;
+  --primary-800: #140000;
+  --primary-900: #0e0000;
+  --primary-950: #050000;
+
+  --gray-50: #f9fafb;
+  --gray-100: #f3f4f6;
+  --gray-200: #e5e7eb;
+  --gray-300: #d1d5db;
+  --gray-400: #9ca3af;
+  --gray-500: #6b7280;
+  --gray-600: #4b5563;
+  --gray-700: #374151;
+  --gray-800: #1f2937;
+  --gray-900: #111827;
+  --gray-950: #030712;
+
+  --neutral-0: #ffffff;
+  --neutral-50: #fafafa;
+  --neutral-100: #f8f8f8;
+  --neutral-200: #e5e5e5;
+  --neutral-300: #d4d4d4;
+  --neutral-400: #a3a3a3;
+  --neutral-500: #737373;
+  --neutral-600: #525252;
+  --neutral-700: #404040;
+  --neutral-800: #262626;
+  --neutral-900: #171717;
+  --neutral-950: #101010;
+  --neutral-1000: #000000;
+}
+
+/* Tokens */
+:root {
+  --surface-base: var(--neutral-0);
+  --surface-primary: var(--neutral-100);
+  --button-background-primary: var(--neutral-100);
+  --button-primary: var(--neutral-100);
+  --heading: var(--neutral-950);
+  --body: var(--neutral-800);
+  --link: var(--secondary-400);
+  --white: var(--neutral-0);
+  --surface-secondary: var(--neutral-400);
+  --surface-contrast: var(--neutral-600);
+  --surface-heavy-contrast: var(--neutral-800);
+  --surface-invert: var(--neutral-1000);
+  --surface-brand-primary: var(--primary-400);
+  --surface-brand-secondary: var(--secondary-400);
+  --border-default: var(--neutral-0);
+  --border-light: var(--neutral-0);
+  --buttonoutline: var(--neutral-1000);
+  --surface-primary-invert: var(--neutral-950);
+  --surface-secondary-invert: var(--neutral-700);
+  --body-2: var(--neutral-700);
+}
+
+.dark {
+  --surface-base: var(--neutral-1000);
+  --surface-primary: var(--neutral-900);
+  --surface-secondary: var(--neutral-600);
+  --surface-contrast: var(--neutral-400);
+  --surface-heavy-contrast: var(--neutral-300);
+  --surface-invert: var(--neutral-0);
+  --surface-brand-primary: var(--primary-800);
+  --surface-brand-secondary: var(--secondary-800);
+  --surface-primary-invert: var(--neutral-100);
+  --surface-secondary-invert: var(--neutral-200);
+
+
+  --button-background-primary: var(--neutral-100);
+  --button-primary: var(--neutral-100);
+  
+  --heading: var(--neutral-100);
+  --body: var(--neutral-100);
+  --link: var(--secondary-400);
+  --white: var(--neutral-0);
+
+  --border-default: var(--neutral-0);
+  --border-light: var(--neutral-0);
+  --button-outline: var(--neutral-1000);
+
+  --body-2: var(--neutral-600);
+}
+
+/* :root {
   --background: hsl(0 0% 100%);
   --foreground: hsl(0 0% 3.9%);
   --card: hsl(0 0% 100%);
@@ -57,10 +152,17 @@
   --chart-3: hsl(30 80% 55%);
   --chart-4: hsl(280 65% 60%);
   --chart-5: hsl(340 75% 55%);
-}
+} */
 
-@theme inline {
-  --color-background: var(--background);
+@theme {
+  --font-title: var(--title);
+  --font-body: var(--body);
+  --font-code: var(--code);
+
+  --color-primary: var(--primary-500);
+  --color-text: var(--text-body);
+  --color-background: var(--surface-base);
+  /* --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
@@ -87,15 +189,14 @@
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
+  --radius-xl: calc(var(--radius) + 4px); */
 }
 
-@layer base {
+/* @layer base {
   * {
     @apply border-border outline-ring/50;
   }
   body {
     @apply bg-background text-foreground;
   }
-}
-
+} */

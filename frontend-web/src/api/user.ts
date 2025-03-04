@@ -1,21 +1,29 @@
 import apiClient from "@/api/axios";
 import axios from "axios";
 
-export interface UserProfile {
-  firstName: string;
-  lastName: string;
-  imageUrl: string | null;
+export interface Account {
+  id: string;
+  userId: string;
+  accountType: string;
+  accountPlan: string;
+  iban: string;
+  balance: number;
+  cards: number;
 }
 
-export async function fetchUserProfile(): Promise<UserProfile> {
-    try {
-        const response = await apiClient.get("/api/User/profile");
-        return response.data;
-    } catch (error: unknown) {
-      if (axios.isAxiosError(error)) {
-        throw error.response?.data || error.message;
-      } else {
-        throw "An unexpected error occurred.";
-      }
+export async function fetchBankAccountInfo(): Promise<Account[]> {
+  try {
+    const response = await apiClient.get<Account[]>("/api/BankAccount"); 
+    return response.data;
+  } catch (error: unknown) {
+    console.error("Error fetching bank account info:", error);
+
+    if (axios.isAxiosError(error) && error.response) {
+      return Promise.reject(
+        error.response.data.message || "Failed to fetch bank account info.",
+      );
     }
+
+    return Promise.reject("An unexpected error occurred.");
   }
+}

@@ -39,9 +39,8 @@ export default function LoginPage() {
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     try {
-      const token = await loginUser(data);
-      localStorage.setItem("accessToken", token);
-      login("user");
+      await loginUser(data);
+      login("User");
       navigate("/dashboard");
     } catch (err) {
       console.error("Login failed", err);
