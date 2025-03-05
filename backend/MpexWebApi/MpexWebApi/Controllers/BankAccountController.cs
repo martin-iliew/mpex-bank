@@ -7,6 +7,8 @@ using MpexWebApi.Core.Services;
 using MpexWebApi.Core.Services.Contracts;
 using MpexWebApi.Core.ViewModels.BankAccount;
 using MpexWebApi.Core.ViewModels.Card;
+using MpexWebApi.Core.ViewModels.Cards;
+using MpexWebApi.Infrastructure.Constants.Enums;
 using MpexWebApi.Infrastructure.Data.Models;
 using System.Security.Claims;
 
@@ -30,7 +32,7 @@ namespace MpexWebApi.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        public async Task<IActionResult> BankAccount(string? id)
+        public async Task<IActionResult> BankAccounts(string? id)
         {
 
             if (!Guid.TryParse(id, out Guid bankAccountGuidId))
@@ -55,7 +57,7 @@ namespace MpexWebApi.Controllers
             return Ok(bankAccount);
         }
 
-        [HttpGet]
+        [HttpGet("/BankAccounts")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -78,6 +80,33 @@ namespace MpexWebApi.Controllers
 
             IEnumerable<AllBankAccountViewModel?> allBankAccounts = await bankAccountService
                 .GetAllBankAccountAsync(userIdGuid);
+
+            return Ok(allBankAccounts);
+        }
+
+        [HttpGet("AllCards")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public async Task<IActionResult> AllCards()
+        {
+
+            var userId = User.GetId();
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+
+            if (!Guid.TryParse(userId, out Guid userIdGuid))
+            {
+                return BadRequest();
+            }
+
+            IEnumerable<AllCardsViewModel?> allBankAccounts = await bankAccountService
+                .GetAllCardsAsync(userIdGuid);
 
             return Ok(allBankAccounts);
         }
@@ -115,6 +144,12 @@ namespace MpexWebApi.Controllers
 
 
         [HttpPost("{bankAccountId}/create-card")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<IActionResult> CreateCard(string? bankAccountId)
         {
             if (!Guid.TryParse(bankAccountId, out Guid bankAccountGuidId))
@@ -130,8 +165,12 @@ namespace MpexWebApi.Controllers
             }
 
             var userId = User.GetId();
-            if (userId == null || bankAccount.UserId.ToString().ToLower() !=
-                userId.ToString().ToLower())
+            if(userId == null)
+            {
+                return Unauthorized();
+            }
+
+            if (bankAccount.UserId.ToString().ToLower() != userId.ToString().ToLower())
             {
                 return Forbid();
             }
@@ -142,6 +181,37 @@ namespace MpexWebApi.Controllers
             {
                 return BadRequest();
             }
+
+            return Created();
+        }
+
+        [HttpPost("create-bankAccount")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public async Task<IActionResult> CreateBankAccount(int accountPlan, int accountType)
+        {
+            var userId = User.GetId();
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+
+            if (!Guid.TryParse(userId, out Guid userIdGuid))
+            {
+                return BadRequest();
+            }
+
+            if(!Enum.IsDefined(typeof(AccountPlans), accountPlan) ||
+                !Enum.IsDefined(typeof(AccountPlans), accountType))
+            {
+                return BadRequest();
+            }
+
+            await bankAccountService.CreateBankAccountAsync(userIdGuid, accountPlan, accountType);
 
             return Created();
         }
