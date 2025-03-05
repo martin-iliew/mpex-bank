@@ -9,6 +9,7 @@ using MpexTestApi.Core.Services.Contracts;
 using MpexWebApi.Core.ViewModels;
 using MpexWebApi.Core.Services.Contracts;
 using MpexTestApi.Extensions;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace MpexTestApi.Controllers
 {
@@ -72,21 +73,8 @@ namespace MpexTestApi.Controllers
                 return Unauthorized();
             }
 
-            Response.Cookies.Append("refreshToken", authResponse.RefreshToken, new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.Strict,
-                Expires = DateTime.UtcNow.AddDays(1)
-            });
-
-            Response.Cookies.Append("Token", authResponse.Token, new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.Strict,
-                Expires = DateTime.UtcNow.AddMinutes(15)
-            });
+            CreateCookie("refreshToken", authResponse.RefreshToken, 20);
+            CreateCookie("Token", authResponse.Token, 15);
 
             return Ok(authResponse);
         }
@@ -106,22 +94,22 @@ namespace MpexTestApi.Controllers
             {
                 return Unauthorized();
             }
-            Response.Cookies.Append("refreshToken", authResponse.RefreshToken, new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.Strict,
-                Expires = DateTime.UtcNow.AddDays(1)
-            });
 
-            Response.Cookies.Append("Token", authResponse.Token, new CookieOptions
+            CreateCookie("refreshToken", authResponse.RefreshToken, 20);
+            CreateCookie("Token", authResponse.Token, 15);
+            return Ok(authResponse);
+        }
+
+
+        private void CreateCookie(string Value, string Key, int expiryMinutes)
+        {
+            Response.Cookies.Append(Value, Key, new CookieOptions
             {
                 HttpOnly = true,
                 Secure = true,
                 SameSite = SameSiteMode.Strict,
-                Expires = DateTime.UtcNow.AddMinutes(15)
+                Expires = DateTime.UtcNow.AddMinutes(expiryMinutes)
             });
-            return Ok(authResponse);
         }
     }
 }

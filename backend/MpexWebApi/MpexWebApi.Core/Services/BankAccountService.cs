@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using MpexWebApi.Core.Services.Contracts;
 using MpexWebApi.Core.ViewModels.BankAccount;
 using MpexWebApi.Core.ViewModels.Card;
+using MpexWebApi.Core.ViewModels.Cards;
 using MpexWebApi.Infrastructure.Constants.Enums;
 using MpexWebApi.Infrastructure.Data.Models;
 using System.Globalization;
@@ -42,17 +43,36 @@ namespace MpexWebApi.Core.Services
 
             return bankAccounts;
         }
-        public async Task<BankAccount?> CreateBankAccountAsync(string userId, int accountPlan, int accountType)
-        {
-            if(!Guid.TryParse(userId, out Guid userIdGuid))
-            {
-                return null;
-            }
 
+        public async Task<IEnumerable<AllCardsViewModel?>> GetAllCardsAsync(Guid userId)
+        {
+            var bankAccounts = await cardRepository
+                .GetAllAttached()
+                .Where(c => c.BankAccount.ApplicationUser.Id.Equals(userId))
+                .Select(c => new AllCardsViewModel()
+                {
+                    Id = c.Id.ToString(),
+                    BankAccountId = c.BankAccountId.ToString(),
+                    Balance = c.BankAccount.Balance,
+                    CardNumber = Regex.Replace(c.CardNumber, @"(\d{4})(\d{4})(\d{4})(\d{4})", "$1 $2 $3 $4"),
+                    CVV = c.CVV,
+                    ExpiaryDate = c.ExpiryDate.ToString("MM/yy", CultureInfo.InvariantCulture),
+                    OwnerName = $"{c.BankAccount.ApplicationUser.UserProfile.FirstName} {c.BankAccount.ApplicationUser.UserProfile.LastName}",
+                    CardStatus = c.CardStatus.ToString() ?? "",
+                    AccountPlan = c.BankAccount.AccountPlan.ToString() ?? "",
+                    AccountType = c.BankAccount.AccountType.ToString() ?? ""
+                })
+                .OrderBy(c => c.Balance)
+                .ToListAsync();
+
+            return bankAccounts;
+        }
+        public async Task CreateBankAccountAsync(Guid userId, int accountPlan, int accountType)
+        {
             var newBankAccount = new BankAccount
             {
                 Id = Guid.NewGuid(),
-                UserId = userIdGuid,
+                UserId = userId,
                 AccountNumber = GenerateAccountNumber(),
                 AccountPlan = (AccountPlans)accountPlan,
                 Balance = 0m,
@@ -64,7 +84,7 @@ namespace MpexWebApi.Core.Services
 
             await bankAccountRepository.AddAsync(newBankAccount);
 
-            return newBankAccount;
+            await CreateCardAsync(newBankAccount.Id);
         }
 
         public async Task<bool> CreateCardAsync(Guid bankAccountId)
@@ -72,7 +92,7 @@ namespace MpexWebApi.Core.Services
             var bankAccount = await bankAccountRepository
                 .FirstOrDefaultAsync(ba => ba.Id == bankAccountId);
 
-            if(bankAccount == null)
+            if (bankAccount == null)
             {
                 return false;
             }

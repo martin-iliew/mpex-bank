@@ -30,5 +30,7 @@ namespace MpexWebApi.Core.ViewModels
         [RegularExpression(@"^\d{4,6}$", ErrorMessage = "Password must be a 4 to 6-digit PIN.")]
         public string ConfirmPassword { get; set; } = null!;
 
+        public int AccountPlan { get; set; } = 0;
+
     }
 }

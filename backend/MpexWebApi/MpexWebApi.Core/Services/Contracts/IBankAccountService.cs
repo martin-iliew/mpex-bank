@@ -1,5 +1,6 @@
 ﻿using MpexWebApi.Core.ViewModels.BankAccount;
 using MpexWebApi.Core.ViewModels.Card;
+using MpexWebApi.Core.ViewModels.Cards;
 using MpexWebApi.Infrastructure.Data.Models;
 using System;
 using System.Collections.Generic;
@@ -13,10 +14,12 @@ namespace MpexWebApi.Core.Services.Contracts
     {
         Task<IEnumerable<AllBankAccountViewModel?>> GetAllBankAccountAsync(Guid UserId);
         Task<BankAccountViewModel?> GetBankAccountAsync(Guid bankAccountId);
-        Task<BankAccount?> CreateBankAccountAsync(string userId, int accountPlan, int accountType);
+        Task CreateBankAccountAsync(Guid userId, int accountPlan, int accountType);
 
         Task<bool> CreateCardAsync (Guid bankAccountId);
         Task<DebitCardViewModel?> GetCardAsync(Guid cardId);
+
+        Task<IEnumerable<AllCardsViewModel?>> GetAllCardsAsync(Guid userId); 
 
         Task<bool> FreezeCard(string cardId);
 
