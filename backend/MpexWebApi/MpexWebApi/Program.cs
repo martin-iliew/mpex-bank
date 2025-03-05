@@ -1,6 +1,9 @@
+using Microsoft.AspNetCore.Server.Kestrel.Https;
 using Microsoft.OpenApi.Models;
 using MpexTestApi.Extensions;
 using MpexTestApi.Infrastructure.Data.Models;
+using System.Net;
+using System.Security.Cryptography.X509Certificates;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,6 +27,13 @@ builder.Services.AddCors(options =>
             .AllowAnyOrigin()
             .AllowAnyHeader()
             .AllowAnyMethod());
+
+    options.AddPolicy("AllowFrontEnd",
+        policy => policy
+            .WithOrigins("https://localhost:5173")
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials());
 });
 
 builder.Services.AddSwaggerGen(c =>
@@ -56,6 +66,19 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+var httpsConnectionAdapterOptions = new HttpsConnectionAdapterOptions
+{
+    SslProtocols = System.Security.Authentication.SslProtocols.Tls12,
+    ClientCertificateMode = ClientCertificateMode.AllowCertificate,
+    ServerCertificate = new X509Certificate2("../../../certificate/certificate.pfx", "123456")
+
+};
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ConfigureEndpointDefaults(listenOptions =>
+        listenOptions.UseHttps(httpsConnectionAdapterOptions));
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -67,7 +90,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseCors("AllowAll");
+app.UseCors("AllowFrontEnd");
 
 app.UseAuthentication();
 app.UseAuthorization();
