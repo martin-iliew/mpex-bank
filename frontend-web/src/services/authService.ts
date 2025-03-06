@@ -19,10 +19,14 @@ const refreshClient = axios.create({
 });
 
 export const setToken = (token: string | null): void => {
-  accessToken = token;
+  if (accessToken !== token) {
+    accessToken = token;
+  }
 };
 
-export const getToken = (): string | null => accessToken;
+export const getToken = (): string | null => {
+  return accessToken;
+};
 
 export const refreshToken = async (): Promise<string> => {
   if (isRefreshing) {
@@ -34,10 +38,8 @@ export const refreshToken = async (): Promise<string> => {
     const response = await refreshClient.post("/api/Auth/refresh-token", null, {
       withCredentials: true,
     });
-
-    const newAccessToken = response.data.accessToken;
+    const newAccessToken = response.data.token;
     setToken(newAccessToken);
-
     refreshQueue.forEach((resolve) => resolve(newAccessToken));
     refreshQueue = [];
     return newAccessToken;

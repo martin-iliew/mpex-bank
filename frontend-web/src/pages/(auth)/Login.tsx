@@ -39,7 +39,7 @@ export default function LoginPage() {
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     try {
       const token = await loginUser(data);
-    
+
       if (!token) {
         throw new Error("No token received");
       }
