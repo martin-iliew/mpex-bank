@@ -74,7 +74,7 @@ namespace MpexTestApi.Controllers
                 return Unauthorized();
             }
 
-            CreateCookie("refreshToken", authResponse.RefreshToken, 20); 
+            CreateCookie("refreshToken", authResponse.RefreshToken, 15); 
 
             return Ok(new { Token = authResponse.Token });
         }
@@ -89,27 +89,32 @@ namespace MpexTestApi.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> RefreshToken()
         {
-            if(!Request.Cookies.TryGetValue("refreshToken", out var refreshToken))
+            var currentUser = User.GetId();
+
+            if (String.IsNullOrEmpty(currentUser) || !Request.Cookies.TryGetValue("refreshToken", out var refreshToken))
             {
                 return Unauthorized();
             }
 
             var user = await _userManager.Users
-                .FirstOrDefaultAsync(u => u.RefreshToken == refreshToken);
+                .FirstOrDefaultAsync(u => u.RefreshTokens
+                .Any(r => r.RefreshTokenString == refreshToken
+                && r.ExpireDate.HasValue && 
+                r.ExpireDate.Value >= DateTime.UtcNow && !r.IsUsed));
 
-            if(user == null || user.IsRefreshTokenExpired == true)
+            if(user == null || !user.Id.ToString().Equals(currentUser))
             {
                 return Unauthorized();
             }
 
-            var authResponse = await userService.VerifyRefreshToken(user.RefreshToken);
+            var authResponse = await userService.VerifyRefreshToken(refreshToken);
 
             if (authResponse == null)
             {
                 return Unauthorized();
             }
 
-            CreateCookie("refreshToken", authResponse.RefreshToken, 2);
+            CreateCookie("refreshToken", authResponse.RefreshToken, 15);
 
             return Ok(new { Token = authResponse.Token });
         }

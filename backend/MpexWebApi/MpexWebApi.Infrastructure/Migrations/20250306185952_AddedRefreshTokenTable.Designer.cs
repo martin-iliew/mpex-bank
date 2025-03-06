@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MpexTestApi.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using MpexTestApi.Infrastructure.Data;
 namespace MpexWebApi.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250306185952_AddedRefreshTokenTable")]
+    partial class AddedRefreshTokenTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -52,13 +55,13 @@ namespace MpexWebApi.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("ef7d232a-419f-4391-9db7-ce20a7b596bf"),
+                            Id = new Guid("78d6896e-84f0-4eca-9e53-ba10dd584db5"),
                             Name = "User",
                             NormalizedName = "USER"
                         },
                         new
                         {
-                            Id = new Guid("938e25ec-5359-474b-837d-fbc1165e40c3"),
+                            Id = new Guid("d52a02e9-bc2c-4e84-96ee-c8cce54da036"),
                             Name = "Administrator",
                             NormalizedName = "ADMINISTRATOR"
                         });
@@ -362,7 +365,7 @@ namespace MpexWebApi.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("RefreshTokens");
+                    b.ToTable("RefreshToken");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>

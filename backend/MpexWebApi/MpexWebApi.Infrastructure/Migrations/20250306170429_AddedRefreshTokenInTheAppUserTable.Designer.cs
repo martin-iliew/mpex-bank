@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MpexTestApi.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using MpexTestApi.Infrastructure.Data;
 namespace MpexWebApi.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250306170429_AddedRefreshTokenInTheAppUserTable")]
+    partial class AddedRefreshTokenInTheAppUserTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -52,13 +55,13 @@ namespace MpexWebApi.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("ef7d232a-419f-4391-9db7-ce20a7b596bf"),
+                            Id = new Guid("9d8beb66-e209-4b0f-b4cb-e452c3e517a9"),
                             Name = "User",
                             NormalizedName = "USER"
                         },
                         new
                         {
-                            Id = new Guid("938e25ec-5359-474b-837d-fbc1165e40c3"),
+                            Id = new Guid("f480d2e6-2531-4659-b201-91a9ce888f9e"),
                             Name = "Administrator",
                             NormalizedName = "ADMINISTRATOR"
                         });
@@ -219,6 +222,12 @@ namespace MpexWebApi.Infrastructure.Migrations
                     b.Property<string>("ProfilePicture")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("RefreshToken")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("RefreshTokenExpiry")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
@@ -340,31 +349,6 @@ namespace MpexWebApi.Infrastructure.Migrations
                     b.ToTable("Cards");
                 });
 
-            modelBuilder.Entity("MpexWebApi.Infrastructure.Data.Models.RefreshToken", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("ExpireDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsUsed")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("RefreshTokenString")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("RefreshTokens");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", null)
@@ -449,22 +433,9 @@ namespace MpexWebApi.Infrastructure.Migrations
                     b.Navigation("BankAccount");
                 });
 
-            modelBuilder.Entity("MpexWebApi.Infrastructure.Data.Models.RefreshToken", b =>
-                {
-                    b.HasOne("MpexTestApi.Infrastructure.Data.Models.ApplicationUser", "User")
-                        .WithMany("RefreshTokens")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("MpexTestApi.Infrastructure.Data.Models.ApplicationUser", b =>
                 {
                     b.Navigation("BankAccounts");
-
-                    b.Navigation("RefreshTokens");
 
                     b.Navigation("UserProfile");
                 });
