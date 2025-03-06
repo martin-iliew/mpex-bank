@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using MpexTestApi.Core.Services.Contracts;
 using MpexTestApi.Infrastructure.Constants.Enums;
+using MpexTestApi.Infrastructure.Data;
 using MpexTestApi.Infrastructure.Data.Models;
 using MpexWebApi.Core.Services;
 using MpexWebApi.Core.Services.Contracts;
@@ -18,16 +20,19 @@ namespace MpexTestApi.Core.Services
         private readonly UserManager<ApplicationUser> userManager;
         private readonly IConfiguration config;
         private readonly IBankAccountService bankAccountService;
+        private readonly AppDbContext context;
 
         private const string loginProvider = "MpexApi";
         private const string refreshToken = "RefreshToken";
 
         public UserService(UserManager<ApplicationUser> userManager,
-            IConfiguration config, IBankAccountService bankAccountService)
+            IConfiguration config, IBankAccountService bankAccountService,
+            AppDbContext context)
         {
             this.userManager = userManager;
             this.config = config;
             this.bankAccountService = bankAccountService;
+            this.context = context;
         }
         public async Task<IEnumerable<IdentityError>> Register(RegisterInputModel model)
         {
@@ -124,45 +129,47 @@ namespace MpexTestApi.Core.Services
 
         public async Task<string> CreateRefreshToken(ApplicationUser user)
         {
-            await userManager.RemoveAuthenticationTokenAsync(user, loginProvider, refreshToken);
-
-            var newRefreshToken = await userManager.GenerateUserTokenAsync(user, loginProvider,
+            string newRefreshToken = await userManager.GenerateUserTokenAsync(user, loginProvider,
                 refreshToken);
 
-            await userManager.SetAuthenticationTokenAsync(user, loginProvider, refreshToken, 
-                newRefreshToken);
+            user.RefreshToken = newRefreshToken;
+            user.RefreshTokenExpiry = DateTime.UtcNow.AddMinutes(2);
+
+            await userManager.UpdateAsync(user);
 
             return newRefreshToken;
         }
 
-        public async Task<AuthResponseViewModel?> VerifyRefreshToken(AuthResponseViewModel request)
+        public async Task<AuthResponseViewModel?> VerifyRefreshToken(string? refreshToken)
         {
-            var jwtSecurityTokenHandler = new JwtSecurityTokenHandler();
-            var tokenContent = jwtSecurityTokenHandler.ReadJwtToken(request.Token);
-            var email = tokenContent.Claims.FirstOrDefault(q => q.Type ==
-            JwtRegisteredClaimNames.Email)?.Value;
-
-            var user = await userManager.FindByEmailAsync(email);
-
-            if(user == null || user.Id.ToString() != request.UserId)
+            var user = await userManager.Users
+                .FirstOrDefaultAsync(c => c.RefreshToken == refreshToken);
+            if (user == null)
             {
-                return null;
+                return null; 
             }
-            var isValidRefreshToken = await userManager.VerifyUserTokenAsync(user, loginProvider,
-                refreshToken, request.RefreshToken);
 
-            if (!isValidRefreshToken)
+            if (user.IsRefreshTokenExpired)
             {
-                await userManager.UpdateSecurityStampAsync(user);
+                user.RefreshToken = null;
+                user.RefreshTokenExpiry = null;
+                await context.SaveChangesAsync();
                 return null;
             }
 
-            var token = await GenerateToken(user);
+            var newAccessToken = await GenerateToken(user);
+            var newRefrshToken = await CreateRefreshToken(user);
+
+            user.RefreshToken = newRefrshToken;
+            user.RefreshTokenExpiry = DateTime.UtcNow.AddMinutes(2);
+
+            await context.SaveChangesAsync();
+
             return new AuthResponseViewModel
             {
-                Token = token,
+                Token = newAccessToken,
                 UserId = user.Id.ToString(),
-                RefreshToken = await CreateRefreshToken(user)
+                RefreshToken = newRefrshToken
             };
         }
     }

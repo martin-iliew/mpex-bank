@@ -28,8 +28,10 @@ namespace MpexTestApi.Infrastructure.Data.Models
 
         public virtual IEnumerable<BankAccount> BankAccounts { get; set; } = new List<BankAccount>();
 
-        //public string? RefreshToken { get; set; }
+        public string? RefreshToken { get; set; }
 
-        //public DateTime? RefreshTokenExpiry { get; set; }
+        public DateTime? RefreshTokenExpiry { get; set; }
+
+        public bool IsRefreshTokenExpired => RefreshTokenExpiry.HasValue && RefreshTokenExpiry.Value <= DateTime.UtcNow;
     }
 }
