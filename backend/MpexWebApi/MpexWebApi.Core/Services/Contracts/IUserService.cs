@@ -9,7 +9,7 @@ namespace MpexTestApi.Core.Services.Contracts
         Task<IEnumerable<IdentityError>> Register(RegisterInputModel model);
         Task<AuthResponseViewModel?> Login(LoginInputModel model);
         Task<string> CreateRefreshToken(ApplicationUser user);
-        Task<AuthResponseViewModel?> VerifyRefreshToken(AuthResponseViewModel request);
+        Task<AuthResponseViewModel?> VerifyRefreshToken(string? refreshToken);
 
     }
 }

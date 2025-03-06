@@ -10,6 +10,7 @@ using MpexWebApi.Core.ViewModels;
 using MpexWebApi.Core.Services.Contracts;
 using MpexTestApi.Extensions;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.EntityFrameworkCore;
 
 namespace MpexTestApi.Controllers
 {
@@ -86,16 +87,29 @@ namespace MpexTestApi.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<IActionResult> RefreshToken([FromBody] AuthResponseViewModel request)
+        public async Task<IActionResult> RefreshToken()
         {
-            var authResponse = await userService.VerifyRefreshToken(request);
+            if(!Request.Cookies.TryGetValue("refreshToken", out var refreshToken))
+            {
+                return Unauthorized();
+            }
+
+            var user = await _userManager.Users
+                .FirstOrDefaultAsync(u => u.RefreshToken == refreshToken);
+
+            if(user == null || user.IsRefreshTokenExpired == true)
+            {
+                return Unauthorized();
+            }
+
+            var authResponse = await userService.VerifyRefreshToken(user.RefreshToken);
 
             if (authResponse == null)
             {
                 return Unauthorized();
             }
 
-            CreateCookie("refreshToken", authResponse.RefreshToken, 20);
+            CreateCookie("refreshToken", authResponse.RefreshToken, 2);
 
             return Ok(new { Token = authResponse.Token });
         }
