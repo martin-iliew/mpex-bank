@@ -73,15 +73,15 @@ namespace MpexTestApi.Controllers
                 return Unauthorized();
             }
 
-            CreateCookie("refreshToken", authResponse.RefreshToken, 20);
-            CreateCookie("Token", authResponse.Token, 15);
+            CreateCookie("refreshToken", authResponse.RefreshToken, 20); 
 
-            return Ok(authResponse);
+            return Ok(new { Token = authResponse.Token });
         }
 
 
+
         [HttpPost]
-        [Route("refreshToken")]
+        [Route("refresh-token")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -96,8 +96,8 @@ namespace MpexTestApi.Controllers
             }
 
             CreateCookie("refreshToken", authResponse.RefreshToken, 20);
-            CreateCookie("Token", authResponse.Token, 15);
-            return Ok(authResponse);
+
+            return Ok(new { Token = authResponse.Token });
         }
 
 

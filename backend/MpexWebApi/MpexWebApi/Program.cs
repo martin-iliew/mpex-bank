@@ -1,39 +1,28 @@
 using Microsoft.AspNetCore.Server.Kestrel.Https;
 using Microsoft.OpenApi.Models;
 using MpexTestApi.Extensions;
-using MpexTestApi.Infrastructure.Data.Models;
 using System.Net;
-using System.Security.Cryptography.X509Certificates;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
-
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddApplicationDbContext(builder.Configuration);
 builder.Services.AddApplicationIdentity(builder.Configuration);
-
 builder.Services.AddJwtAuthentication(builder.Configuration);
-
 builder.Services.AddApplicationServices();
-
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll",
-        policy => policy
-            .AllowAnyOrigin()
-            .AllowAnyHeader()
-            .AllowAnyMethod());
-
-    options.AddPolicy("AllowFrontEnd",
+    options.AddPolicy("AllowSpecificOrigin",
         policy => policy
             .WithOrigins("https://localhost:5173")
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials());
+
 });
 
 builder.Services.AddSwaggerGen(c =>
@@ -66,22 +55,16 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-var httpsConnectionAdapterOptions = new HttpsConnectionAdapterOptions
-{
-    SslProtocols = System.Security.Authentication.SslProtocols.Tls12,
-    ClientCertificateMode = ClientCertificateMode.AllowCertificate,
-    ServerCertificate = new X509Certificate2("../../../certificate/certificate.pfx", "123456")
-
-};
 builder.WebHost.ConfigureKestrel(options =>
 {
-    options.ConfigureEndpointDefaults(listenOptions =>
-        listenOptions.UseHttps(httpsConnectionAdapterOptions));
+    options.Listen(IPAddress.Loopback, 5187, listenOptions =>
+    {
+        listenOptions.UseHttps("C:\\Users\\Martin\\Desktop\\Projects\\StarterKit\\Certificates\\certificate.pfx", "123456"); 
+    });
 });
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -89,9 +72,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
-app.UseCors("AllowFrontEnd");
-
+app.UseCors("AllowSpecificOrigin");
 app.UseAuthentication();
 app.UseAuthorization();
 

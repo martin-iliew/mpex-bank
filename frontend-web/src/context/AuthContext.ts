@@ -1,10 +1,10 @@
 import { createContext } from "react";
 
 export interface AuthContextType {
-  isAuthenticated: boolean;
+  token: string | null;
   userRole: string | null;
-  login: (role: string) => void;
+  isAuthenticated: boolean;
+  setToken: (token: string | null) => void;
   logout: () => void;
 }
-
-export const AuthContext = createContext<AuthContextType | undefined>(undefined);
+export const AuthContext = createContext<AuthContextType | null>(null);

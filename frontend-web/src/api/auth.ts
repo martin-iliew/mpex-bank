@@ -1,20 +1,21 @@
-import apiClient from "@/api/axios";
+import apiClient from "@/api/apiClient";
 import axios from "axios";
 
-interface LoginPayload {
+export interface LoginPayload {
   email: string;
   password: string;
 }
 
-export async function loginUser(data: LoginPayload): Promise<void> {
+export async function loginUser(data: LoginPayload): Promise<string> {
   try {
-    await apiClient.post("/api/Auth/login", data);
-  } catch (error: unknown) {
-    if (axios.isAxiosError(error) && error.response) {
-      throw error.response.data.message || "Login failed.";
-    } else {
-      throw "An unexpected error occurred.";
-    }
+    const response = await apiClient.post<{ token: string }>(
+      "/api/Auth/login",
+      data,
+    );
+    return response.data.token;
+  } catch (error) {
+    console.error("Login failed:", error);
+    throw error;
   }
 }
 

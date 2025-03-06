@@ -12,9 +12,9 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useAuth } from "@/hooks/useAuth";
 import { loginUser } from "@/api/auth";
 import { Link, useNavigate } from "react-router-dom";
+import { setToken } from "@/services/authService";
 
 const FormSchema = z.object({
   email: z.string().email({
@@ -26,7 +26,6 @@ const FormSchema = z.object({
 });
 
 export default function LoginPage() {
-  const { login } = useAuth();
   const navigate = useNavigate();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -39,8 +38,12 @@ export default function LoginPage() {
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     try {
-      await loginUser(data);
-      login("User");
+      const token = await loginUser(data);
+    
+      if (!token) {
+        throw new Error("No token received");
+      }
+      setToken(token);
       navigate("/dashboard");
     } catch (err) {
       console.error("Login failed", err);
