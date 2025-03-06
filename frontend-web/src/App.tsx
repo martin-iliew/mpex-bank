@@ -5,10 +5,8 @@ import DashboardPage from "./pages/(dashboard)/Dashboard";
 import HomePage from "./pages/Home";
 // import AuthGuard from "./guards/AuthGuard";
 // import GuestGuard from "@/guards/GuestGuard";
-import useTokenRefresh from "@/hooks/useTokenRefresh";
 
 const App = () => {
-  useTokenRefresh();
   return (
     <BrowserRouter>
       <Routes>

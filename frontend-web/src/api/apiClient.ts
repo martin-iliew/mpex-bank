@@ -32,7 +32,6 @@ apiClient.interceptors.response.use(
       try {
         const newAccessToken = await refreshToken();
         setToken(newAccessToken);
-        console.log("Access token: ", newAccessToken);
         if (!originalRequest.headers.Authorization) {
           originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
         }

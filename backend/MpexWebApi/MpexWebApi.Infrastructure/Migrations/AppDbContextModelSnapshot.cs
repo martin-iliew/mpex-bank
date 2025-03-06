@@ -52,13 +52,13 @@ namespace MpexWebApi.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("9e91d4e3-76e8-445f-868a-c271999b7f06"),
+                            Id = new Guid("61b83632-c800-4713-9ebe-29d3917f9d21"),
                             Name = "User",
                             NormalizedName = "USER"
                         },
                         new
                         {
-                            Id = new Guid("e659f921-2c37-4d22-b8ba-a0e600cf2edc"),
+                            Id = new Guid("63e975c8-46eb-43d2-b251-5d074772d92c"),
                             Name = "Administrator",
                             NormalizedName = "ADMINISTRATOR"
                         });
@@ -218,6 +218,12 @@ namespace MpexWebApi.Infrastructure.Migrations
 
                     b.Property<string>("ProfilePicture")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RefreshToken")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("RefreshTokenExpiry")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
