@@ -107,15 +107,14 @@ namespace MpexTestApi.Core.Services
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
             var roles = await userManager.GetRolesAsync(user);
-            var roleClaims = roles.Select(role => new Claim(ClaimTypes.Role, role)).ToList();
+            var roleClaims = roles.Select(role => new Claim("role", role)).ToList();
             var userClaims = await userManager.GetClaimsAsync(user);
 
             var claims = new List<Claim>
             {
                 new Claim("uid", user.Id.ToString()),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
-                new Claim(JwtRegisteredClaimNames.Email, user.Email)
+                new Claim(JwtRegisteredClaimNames.Sub, user.UserName)
             }
             .Union(userClaims)
             .Union(roleClaims);
