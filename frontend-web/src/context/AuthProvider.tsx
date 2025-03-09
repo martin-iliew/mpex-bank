@@ -1,4 +1,4 @@
-import React, { useState, useEffect, ReactNode } from "react";
+import { useState, useEffect, ReactNode } from "react";
 import { AuthContext, AuthContextType } from "./AuthContext";
 import { setToken, getToken, decodeToken } from "@/services/authService";
 
@@ -6,12 +6,17 @@ interface AuthProviderProps {
   children: ReactNode;
 }
 
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [token, setTokenState] = useState<string | null>(getToken());
+export default function AuthProvider({ children }: AuthProviderProps) {
+  // eslint-disable-next-line
+  debugger;
+
+  const [token, setTokenState] = useState<string | null>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
 
+  const isAuthenticated = Boolean(token);
+
   useEffect(() => {
-    if (token) {
+    if (getToken()) {
       const decoded = decodeToken();
       if (decoded) {
         setUserRole(decoded.userRole);
@@ -19,7 +24,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     } else {
       setUserRole(null);
     }
-  }, [token]);
+  }, [token, userRole]);
 
   const handleSetToken = (newToken: string | null) => {
     setTokenState(newToken);
@@ -38,8 +43,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     handleSetToken(null);
   };
 
-  const isAuthenticated = Boolean(token);
-
   const authContextValue: AuthContextType = {
     token,
     userRole,
@@ -53,4 +56,4 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       {children}
     </AuthContext.Provider>
   );
-};
+}

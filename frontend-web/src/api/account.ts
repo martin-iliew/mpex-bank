@@ -10,25 +10,6 @@ export interface Account {
   balance: number;
   cards: number;
 }
-export interface Card {
-  id: string;
-  userId: string;
-  cardNumber: string;
-  cvv: string;
-  expiaryDate: string;
-  ownerName: string;
-  cardStatus: string;
-}
-
-export interface AccountById {
-  id: string;
-  userId: string;
-  accountType: string;
-  accountPlan: string;
-  iban: string;
-  balance: number;
-  cards: Card[];
-}
 
 export async function fetchBankAccountInfo(): Promise<Account[]> {
   try {
@@ -46,6 +27,26 @@ export async function fetchBankAccountInfo(): Promise<Account[]> {
     return Promise.reject("An unexpected error occurred.");
   }
 }
+
+export interface Card {
+  id: string;
+  userId: string;
+  cardNumber: string;
+  cvv: string;
+  expiaryDate: string;
+  ownerName: string;
+  cardStatus: string;
+}
+
+export interface AccountById {
+  id: string;
+  userId: string;
+  accountType: string;
+  iban: string;
+  balance: number;
+  cards: Card[];
+}
+
 
 export async function fetchBankAccountById(id: string): Promise<AccountById> {
   try {
