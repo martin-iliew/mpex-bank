@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using CarApp.Infrastructure.Data.Repositories.Interfaces;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -9,6 +10,7 @@ using MpexTestApi.Infrastructure.Data.Models;
 using MpexWebApi.Core.Services;
 using MpexWebApi.Core.Services.Contracts;
 using MpexWebApi.Core.ViewModels;
+using MpexWebApi.Infrastructure.Data.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -21,18 +23,20 @@ namespace MpexTestApi.Core.Services
         private readonly IConfiguration config;
         private readonly IBankAccountService bankAccountService;
         private readonly AppDbContext context;
+        private readonly IRepository<RefreshToken, Guid> refreshTokenRepository;
 
         private const string loginProvider = "MpexApi";
         private const string refreshToken = "RefreshToken";
 
         public UserService(UserManager<ApplicationUser> userManager,
             IConfiguration config, IBankAccountService bankAccountService,
-            AppDbContext context)
+            AppDbContext context, IRepository<RefreshToken, Guid> refreshTokenRepository)
         {
             this.userManager = userManager;
             this.config = config;
             this.bankAccountService = bankAccountService;
             this.context = context;
+            this.refreshTokenRepository = refreshTokenRepository;
         }
         public async Task<IEnumerable<IdentityError>> Register(RegisterInputModel model)
         {
@@ -103,15 +107,14 @@ namespace MpexTestApi.Core.Services
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
             var roles = await userManager.GetRolesAsync(user);
-            var roleClaims = roles.Select(role => new Claim(ClaimTypes.Role, role)).ToList();
+            var roleClaims = roles.Select(role => new Claim("role", role)).ToList();
             var userClaims = await userManager.GetClaimsAsync(user);
 
             var claims = new List<Claim>
             {
                 new Claim("uid", user.Id.ToString()),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
-                new Claim(JwtRegisteredClaimNames.Email, user.Email)
+                new Claim(JwtRegisteredClaimNames.Sub, user.UserName)
             }
             .Union(userClaims)
             .Union(roleClaims);
@@ -132,44 +135,53 @@ namespace MpexTestApi.Core.Services
             string newRefreshToken = await userManager.GenerateUserTokenAsync(user, loginProvider,
                 refreshToken);
 
-            user.RefreshToken = newRefreshToken;
-            user.RefreshTokenExpiry = DateTime.UtcNow.AddMinutes(2);
+            var expiryDate = DateTime.UtcNow.AddMinutes(15);
 
-            await userManager.UpdateAsync(user);
+            var refreshTokenModel = new RefreshToken
+            {
+                Id = Guid.NewGuid(),
+                RefreshTokenString = newRefreshToken,
+                ExpireDate = expiryDate,
+                UserId = user.Id,
+                IsUsed = false
+            };
+
+
+            await refreshTokenRepository.AddAsync(refreshTokenModel);
 
             return newRefreshToken;
         }
 
         public async Task<AuthResponseViewModel?> VerifyRefreshToken(string? refreshToken)
         {
-            var user = await userManager.Users
-                .FirstOrDefaultAsync(c => c.RefreshToken == refreshToken);
-            if (user == null)
+            var refreshTokenRecord = await refreshTokenRepository
+                .FirstOrDefaultAsync(r => r.RefreshTokenString == refreshToken && !r.IsUsed
+                && r.ExpireDate.HasValue && r.ExpireDate.Value >= DateTime.UtcNow);
+
+            if (refreshTokenRecord == null)
             {
                 return null; 
             }
+            refreshTokenRecord.IsUsed = true;
 
-            if (user.IsRefreshTokenExpired)
+            await refreshTokenRepository.UpdateAsync(refreshTokenRecord);
+
+            var user = await userManager.FindByIdAsync(refreshTokenRecord.UserId.ToString());
+
+            if(user == null)
             {
-                user.RefreshToken = null;
-                user.RefreshTokenExpiry = null;
-                await context.SaveChangesAsync();
                 return null;
             }
 
             var newAccessToken = await GenerateToken(user);
-            var newRefrshToken = await CreateRefreshToken(user);
-
-            user.RefreshToken = newRefrshToken;
-            user.RefreshTokenExpiry = DateTime.UtcNow.AddMinutes(2);
-
-            await context.SaveChangesAsync();
+            var newRefreshToken = await CreateRefreshToken(user);
 
             return new AuthResponseViewModel
             {
-                Token = newAccessToken,
                 UserId = user.Id.ToString(),
-                RefreshToken = newRefrshToken
+                Token = newAccessToken,
+                RefreshToken = newRefreshToken
+
             };
         }
     }
