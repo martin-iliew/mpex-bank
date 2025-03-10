@@ -2,17 +2,18 @@ import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 
 interface AuthGuardProps {
-  children: React.ReactNode;
+  children?: React.ReactNode;
   requiredRole?: string;
 }
 
 const AuthGuard = ({ children, requiredRole }: AuthGuardProps) => {
   const { isAuthenticated, userRole } = useAuth();
+
   if (!isAuthenticated) {
     return <Navigate to="/login" />;
   }
 
-  if (requiredRole && userRole !== requiredRole) {
+  if (requiredRole && userRole == requiredRole) {
     return <Navigate to="/unauthorized" />;
   }
 

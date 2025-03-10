@@ -1,6 +1,7 @@
 import axios from "axios";
-import { getToken, refreshToken } from "@/services/authService";
-
+import { getToken } from "@/lib/utils";
+import { refreshToken } from "@/api/auth";
+import { setToken } from "@/lib/utils";
 const apiClient = axios.create({
   baseURL: "https://localhost:5187/",
   headers: {
@@ -10,7 +11,6 @@ const apiClient = axios.create({
 });
 
 apiClient.interceptors.request.use(
-  
   (config) => {
     const token = getToken();
     if (token && !config.headers.Authorization) {
@@ -27,14 +27,18 @@ apiClient.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    if (
+      error.response?.status === 401 &&
+      !originalRequest._retry &&
+      !originalRequest.url.includes("/api/Auth/refresh-token")
+    ) {
       originalRequest._retry = true;
       try {
         const newAccessToken = await refreshToken();
-        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+        setToken(newAccessToken);
+        originalRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
         return apiClient(originalRequest);
       } catch (tokenRefreshError) {
-        console.error("Token refresh failed", tokenRefreshError);
         return Promise.reject(tokenRefreshError);
       }
     }

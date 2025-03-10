@@ -1,54 +1,61 @@
 import { useState, useEffect, ReactNode } from "react";
 import { AuthContext, AuthContextType } from "./AuthContext";
-import { setToken, getToken, decodeToken } from "@/services/authService";
-
+import { setToken, getToken, decodeToken } from "@/lib/utils";
+import { refreshToken } from "@/api/auth";
+import { logoutUser } from "@/api/auth";
 interface AuthProviderProps {
   children: ReactNode;
 }
 
 export default function AuthProvider({ children }: AuthProviderProps) {
-  // eslint-disable-next-line
-  debugger;
-
   const [token, setTokenState] = useState<string | null>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
 
-  const isAuthenticated = Boolean(token);
-
-  useEffect(() => {
-    if (getToken()) {
-      const decoded = decodeToken();
-      if (decoded) {
-        setUserRole(decoded.userRole);
-      }
-    } else {
-      setUserRole(null);
-    }
-  }, [token, userRole]);
-
-  const handleSetToken = (newToken: string | null) => {
-    setTokenState(newToken);
-    setToken(newToken);
-    if (newToken) {
-      const decoded = decodeToken();
-      if (decoded) {
-        setUserRole(decoded.userRole);
-      }
-    } else {
-      setUserRole(null);
+  const setUserRoleFromToken = () => {
+    const decoded = decodeToken();
+    if (decoded) {
+      setUserRole(decoded.role);
+      console.log(decoded.role);
     }
   };
 
+  useEffect(() => {
+    const initializeAuth = async () => {
+      try {
+        const storedToken = getToken();
+        if (!storedToken) {
+          const newAccessToken = await refreshToken();
+          if (newAccessToken) {
+            setTokenState(newAccessToken);
+            setUserRoleFromToken();
+          }
+        } else {
+          setTokenState(storedToken);
+          setUserRoleFromToken();
+        }
+      } catch (error) {
+        console.error("Token refresh failed", error);
+        setUserRole(null);
+        setTokenState(null);
+      }
+    };
+
+    initializeAuth();
+  }, []);
+
   const logout = () => {
-    handleSetToken(null);
+    setToken(null);
+    setUserRole(null);
+    setTokenState(null);
+    logoutUser();
   };
 
   const authContextValue: AuthContextType = {
     token,
     userRole,
-    isAuthenticated,
-    setToken: handleSetToken,
     logout,
+    setTokenState,
+    isAuthenticated: !!token,
   };
 
   return (

@@ -14,7 +14,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { loginUser } from "@/api/auth";
 import { Link, useNavigate } from "react-router-dom";
-import { setToken } from "@/services/authService";
+import { setToken } from "@/lib/utils";
+import { useAuth } from "@/hooks/useAuth"; 
 
 const FormSchema = z.object({
   email: z.string().email({
@@ -28,6 +29,7 @@ const FormSchema = z.object({
 export default function LoginPage() {
   const navigate = useNavigate();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const { setTokenState } = useAuth();
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -36,19 +38,20 @@ export default function LoginPage() {
     },
   });
 
-  async function onSubmit(data: z.infer<typeof FormSchema>) {
+  const onSubmit = async (data: z.infer<typeof FormSchema>) => {
     try {
       const token = await loginUser(data);
-      setToken(token);
       if (!token) {
         throw new Error("No token received");
       }
+      setToken(token);
+      setTokenState(token);
       navigate("/dashboard");
     } catch (err) {
       console.error("Login failed", err);
       setErrorMessage("Invalid email or password. Please try again.");
     }
-  }
+  };
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-white">

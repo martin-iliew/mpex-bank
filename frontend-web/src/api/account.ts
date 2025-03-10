@@ -19,11 +19,8 @@ export async function fetchBankAccountInfo(): Promise<Account[]> {
     console.error("Error fetching bank account info:", error);
 
     if (axios.isAxiosError(error) && error.response) {
-      return Promise.reject(
-        error.response.data.message || "Failed to fetch bank account info.",
-      );
+      return Promise.reject(error.response.data.message);
     }
-
     return Promise.reject("An unexpected error occurred.");
   }
 }
@@ -47,7 +44,6 @@ export interface AccountById {
   cards: Card[];
 }
 
-
 export async function fetchBankAccountById(id: string): Promise<AccountById> {
   try {
     const response = await apiClient.get<AccountById>(`/api/BankAccount/${id}`);
@@ -56,9 +52,7 @@ export async function fetchBankAccountById(id: string): Promise<AccountById> {
     console.error("Error fetching bank account by ID:", error);
 
     if (axios.isAxiosError(error) && error.response) {
-      return Promise.reject(
-        error.response.data.message || "Failed to fetch bank account details.",
-      );
+      return Promise.reject(error.response.data.message);
     }
 
     return Promise.reject("An unexpected error occurred.");
