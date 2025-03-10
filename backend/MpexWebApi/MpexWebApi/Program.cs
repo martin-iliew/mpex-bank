@@ -59,7 +59,7 @@ builder.WebHost.ConfigureKestrel(options =>
 {
     options.Listen(IPAddress.Loopback, 5187, listenOptions =>
     {
-        listenOptions.UseHttps("../../../certificate/certificate.pfx", "123456"); 
+        listenOptions.UseHttps("C:\\Users\\Martin\\Desktop\\Projects\\StarterKit\\Certificates\\certificate.pfx", "123456");
     });
 });
 

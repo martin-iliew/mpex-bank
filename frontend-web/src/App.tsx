@@ -22,7 +22,7 @@ const App = () => {
         <Route
           path="/dashboard"
           element={
-            <AuthGuard requiredRole="admin">
+            <AuthGuard requiredRole="User">
               <DashboardPage />
             </AuthGuard>
           }

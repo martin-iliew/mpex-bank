@@ -8,7 +8,6 @@ interface GuestGuardProps {
 
 const GuestGuard: React.FC<GuestGuardProps> = ({ children }) => {
   const { isAuthenticated } = useAuth();
-
   if (isAuthenticated) {
     return <Navigate to="/dashboard" />;
   }
