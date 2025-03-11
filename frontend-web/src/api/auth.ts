@@ -1,6 +1,25 @@
 import apiClient from "@/api/apiClient";
 import axios from "axios";
 
+interface RegisterPayload {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+}
+
+export async function registerUser(data: RegisterPayload): Promise<void> {
+  try {
+    await apiClient.post("/api/Auth/register", data);
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error)) {
+      throw error.response?.data || error.message;
+    } else {
+      throw "An unexpected error occurred.";
+    }
+  }
+}
+
 export interface LoginPayload {
   email: string;
   password: string;
@@ -35,29 +54,11 @@ export async function refreshToken(): Promise<string> {
   }
 }
 
-interface RegisterPayload {
-  firstName: string;
-  lastName: string;
-  email: string;
-  password: string;
-}
 export async function logoutUser(): Promise<void> {
   try {
     await apiClient.post("/api/Auth/logout");
   } catch (error) {
     console.error("Logout failed:", error);
     throw new Error("Logout request failed. Please try again.");
-  }
-}
-
-export async function registerUser(data: RegisterPayload): Promise<void> {
-  try {
-    await apiClient.post("/api/Auth/register", data);
-  } catch (error: unknown) {
-    if (axios.isAxiosError(error)) {
-      throw error.response?.data || error.message;
-    } else {
-      throw "An unexpected error occurred.";
-    }
   }
 }

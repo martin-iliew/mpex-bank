@@ -5,6 +5,7 @@ import DashboardPage from "./pages/(dashboard)/Dashboard";
 import HomePage from "./pages/Home";
 import AuthGuard from "./guards/AuthGuard";
 import GuestGuard from "@/guards/GuestGuard";
+import DashboardLayout from "@/layouts/DashboardLayout";
 
 const App = () => {
   return (
@@ -23,7 +24,9 @@ const App = () => {
           path="/dashboard"
           element={
             <AuthGuard requiredRole="User">
-              <DashboardPage />
+              <DashboardLayout>
+                <DashboardPage />
+              </DashboardLayout>
             </AuthGuard>
           }
         />
