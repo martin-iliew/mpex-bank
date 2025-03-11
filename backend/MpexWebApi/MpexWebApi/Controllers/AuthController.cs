@@ -1,16 +1,11 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using MpexTestApi.Infrastructure.Data.Models;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-using MpexTestApi.Core.Services.Contracts;
-using MpexWebApi.Core.ViewModels;
-using MpexWebApi.Core.Services.Contracts;
-using MpexTestApi.Extensions;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.EntityFrameworkCore;
+using MpexTestApi.Core.Services.Contracts;
+using MpexTestApi.Extensions;
+using MpexTestApi.Infrastructure.Data.Models;
+using MpexWebApi.Core.Services.Contracts;
+using MpexWebApi.Core.ViewModels;
 
 namespace MpexTestApi.Controllers
 {
@@ -89,9 +84,7 @@ namespace MpexTestApi.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> RefreshToken()
         {
-            var currentUser = User.GetId();
-
-            if (String.IsNullOrEmpty(currentUser) || !Request.Cookies.TryGetValue("refreshToken", out var refreshToken))
+            if (!Request.Cookies.TryGetValue("refreshToken", out var refreshToken))
             {
                 return Unauthorized();
             }
@@ -102,7 +95,7 @@ namespace MpexTestApi.Controllers
                 && r.ExpireDate.HasValue && 
                 r.ExpireDate.Value >= DateTime.UtcNow && !r.IsUsed));
 
-            if(user == null || !user.Id.ToString().Equals(currentUser))
+            if(user == null)
             {
                 return Unauthorized();
             }
@@ -117,6 +110,20 @@ namespace MpexTestApi.Controllers
             CreateCookie("refreshToken", authResponse.RefreshToken, 15);
 
             return Ok(new { Token = authResponse.Token });
+        }
+
+        [HttpPost]
+        [Route("logout")]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public IActionResult LogOut()
+        {
+            if (Request.Cookies["refreshToken"] != null)
+            {
+                Response.Cookies.Delete("refreshToken");
+            }
+
+            return Ok();
         }
 
 

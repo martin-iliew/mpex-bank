@@ -144,12 +144,12 @@ namespace MpexWebApi.Core.Services
             return true;
         }
 
-        public Task<bool> DisableBankAccount(string userId, string bankAccountId)
+        public Task<bool> DisableBankAccount(Guid userId, Guid bankAccountId)
         {
             throw new NotImplementedException();
         }
 
-        public Task<bool> FreezeCard(string cardId)
+        public Task<bool> FreezeCard(Guid cardId)
         {
             throw new NotImplementedException();
         }
@@ -183,12 +183,44 @@ namespace MpexWebApi.Core.Services
             return model;
         }
 
-        public Task<bool> TransferBetweenOwnAccounts(string senderAccountId, string receiverAccountId, string userId, decimal amount)
+        public async Task<bool> TransferBetweenOwnAccounts(Guid senderAccountId, string receiverIBAN, decimal amount)
         {
-            throw new NotImplementedException();
+            var senderAccount = await bankAccountRepository
+                .FirstOrDefaultAsync(ba => ba.Id == senderAccountId);
+
+            var receiverAccount = await bankAccountRepository
+                .FirstOrDefaultAsync(ba => ba.IBAN == receiverIBAN);
+
+            if (senderAccount == null || receiverAccount == null)
+            {
+                return false;
+            }
+
+            if (senderAccount.UserId != receiverAccount.UserId)
+            {
+                return false;
+            }
+
+            if (senderAccount.IBAN == receiverAccount.IBAN)
+            {
+                return false;
+            }
+
+            if (senderAccount.Balance < amount || amount <= 0)
+            {
+                return false;
+            }
+
+            senderAccount.Balance -= amount;
+            receiverAccount.Balance += amount;
+
+            await bankAccountRepository.UpdateAsync(senderAccount);
+            await bankAccountRepository.UpdateAsync(receiverAccount);
+
+            return true;
         }
 
-        public Task<bool> TransferToIBAN(string bankAccountId, string senderId, string receiverIBAN, decimal amount)
+        public Task<bool> TransferToIBAN(Guid bankAccountId, Guid senderId, string receiverIBAN, decimal amount)
         {
             throw new NotImplementedException();
         }

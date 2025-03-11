@@ -58,7 +58,7 @@ namespace MpexWebApi.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        public async Task<IActionResult> BankAccounts(string? id)
+        public async Task<IActionResult> BankAccount(string? id)
         {
 
             if (!Guid.TryParse(id, out Guid bankAccountGuidId))
@@ -186,7 +186,6 @@ namespace MpexWebApi.Controllers
 
         [HttpPost("create-bank-account")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -212,7 +211,7 @@ namespace MpexWebApi.Controllers
 
             await bankAccountService.CreateBankAccountAsync(userIdGuid, accountPlan, accountType);
 
-            return Created();
+            return Ok();
         }
 
         [HttpPost("{bankAccountId}/deposit")]
@@ -286,6 +285,46 @@ namespace MpexWebApi.Controllers
             }
 
             var success = await bankAccountService.WithdrawAsync(accountId, request.Amount);
+            if (!success)
+            {
+                return BadRequest();
+            }
+
+            return Ok("Withdraw successful.");
+        }
+
+        [HttpPost("{senderBankAccountId}/transfer")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public async Task<IActionResult> TransferBetweenOwnAccounts(string senderBankAccountId, [FromBody]TransferRequest request)
+        {
+            if (!Guid.TryParse(senderBankAccountId, out var bankAccountIdGuid))
+            {
+                return BadRequest();
+            }
+
+            var userId = User.GetId();
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+
+            var bankAccount = await bankAccountService.GetBankAccountAsync(bankAccountIdGuid);
+            if (bankAccount == null || bankAccount.UserId.ToLower() != userId.ToLower())
+            {
+                return Forbid();
+            }
+
+            if (String.IsNullOrEmpty(request.ReceiverIBAN) || request.Amount <= 0)
+            {
+                return BadRequest();
+            }
+
+            var success = await bankAccountService
+                .TransferBetweenOwnAccounts(bankAccountIdGuid, request.ReceiverIBAN, request.Amount);
             if (!success)
             {
                 return BadRequest();

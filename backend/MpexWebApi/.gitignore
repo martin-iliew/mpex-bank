@@ -13,6 +13,8 @@ obj/
 appsettings.json
 appsettings.*.json
 
+Migrations/
+
 # User-specific files
 *.rsuser
 *.suo

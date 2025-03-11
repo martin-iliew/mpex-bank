@@ -15,22 +15,14 @@ namespace MpexWebApi.Core.Services.Contracts
         Task<IEnumerable<AllBankAccountViewModel?>> GetAllBankAccountAsync(Guid UserId);
         Task<BankAccountViewModel?> GetBankAccountAsync(Guid bankAccountId);
         Task CreateBankAccountAsync(Guid userId, int accountPlan, int accountType);
-
         Task<bool> CreateCardAsync (Guid bankAccountId);
         Task<DebitCardViewModel?> GetCardAsync(Guid cardId);
-
         Task<IEnumerable<AllCardsViewModel?>> GetAllCardsAsync(Guid userId); 
-
-        Task<bool> FreezeCard(string cardId);
-
+        Task<bool> FreezeCard(Guid cardId);
         Task<bool> Deposit(Guid bankAccountId, decimal amount);
-
         Task<bool> WithdrawAsync(Guid bankAccountId, decimal amount);
-
-        Task<bool> TransferToIBAN(string bankAccountId, string senderId, string receiverIBAN, decimal amount);
-
-        Task<bool> TransferBetweenOwnAccounts(string senderAccountId, string receiverAccountId, string userId, decimal amount);
-        
-        Task<bool> DisableBankAccount(string userId, string bankAccountId);
+        Task<bool> TransferToIBAN(Guid bankAccountId, Guid senderId, string receiverIBAN, decimal amount);
+        Task<bool> TransferBetweenOwnAccounts(Guid senderAccountId, string receiverIBAN, decimal amount);
+        Task<bool> DisableBankAccount(Guid userId, Guid bankAccountId);
     }
 }
