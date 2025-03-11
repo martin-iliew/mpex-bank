@@ -242,16 +242,16 @@ namespace MpexWebApi.Controllers
 
             if (request.Amount < 10)
             {
-                return BadRequest("Deposit amount must be at least 10€.");
+                return BadRequest();
             }
 
             var success = await bankAccountService.Deposit(accountId, request.Amount);
             if (!success)
             {
-                return NotFound("Bank account not found.");
+                return NotFound();
             }
 
-            return Ok("Deposit successful.");
+            return Ok();
         }
 
         [HttpPost("{bankAccountId}/withdraw")]
@@ -290,7 +290,7 @@ namespace MpexWebApi.Controllers
                 return BadRequest();
             }
 
-            return Ok("Withdraw successful.");
+            return Ok();
         }
 
         [HttpPost("{senderBankAccountId}/transfer")]
@@ -330,7 +330,47 @@ namespace MpexWebApi.Controllers
                 return BadRequest();
             }
 
-            return Ok("Withdraw successful.");
+            return Ok();
+        }
+
+        [HttpPost("{senderBankAccountId}/iban-transfer")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public async Task<IActionResult> TransferToIBAN(string senderBankAccountId, [FromBody] TransferRequest request)
+        {
+            if (!Guid.TryParse(senderBankAccountId, out var senderBankAccountIdGuid))
+            {
+                return BadRequest();
+            }
+
+            var userId = User.GetId();
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+
+            var bankAccount = await bankAccountService.GetBankAccountAsync(senderBankAccountIdGuid);
+            if (bankAccount == null || bankAccount.UserId.ToLower() != userId.ToLower())
+            {
+                return Forbid();
+            }
+
+            if (String.IsNullOrEmpty(request.ReceiverIBAN) || request.Amount <= 0)
+            {
+                return BadRequest();
+            }
+
+            var success = await bankAccountService
+                .TransferToIBAN(senderBankAccountIdGuid, request.ReceiverIBAN, request.Amount);
+            if (!success)
+            {
+                return BadRequest();
+            }
+
+            return Ok();
         }
     }
 }

@@ -21,7 +21,7 @@ namespace MpexWebApi.Core.Services.Contracts
         Task<bool> FreezeCard(Guid cardId);
         Task<bool> Deposit(Guid bankAccountId, decimal amount);
         Task<bool> WithdrawAsync(Guid bankAccountId, decimal amount);
-        Task<bool> TransferToIBAN(Guid bankAccountId, Guid senderId, string receiverIBAN, decimal amount);
+        Task<bool> TransferToIBAN(Guid senderBankAccountId, string receiverIBAN, decimal amount);
         Task<bool> TransferBetweenOwnAccounts(Guid senderAccountId, string receiverIBAN, decimal amount);
         Task<bool> DisableBankAccount(Guid userId, Guid bankAccountId);
     }

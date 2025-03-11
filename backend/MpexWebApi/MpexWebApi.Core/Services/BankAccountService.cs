@@ -220,9 +220,31 @@ namespace MpexWebApi.Core.Services
             return true;
         }
 
-        public Task<bool> TransferToIBAN(Guid bankAccountId, Guid senderId, string receiverIBAN, decimal amount)
+        public async Task<bool> TransferToIBAN(Guid senderBankAccountId, string receiverIBAN, decimal amount)
         {
-            throw new NotImplementedException();
+            var senderAccount = await bankAccountRepository
+                .FirstOrDefaultAsync(ba => ba.Id == senderBankAccountId);
+
+            if (senderAccount == null)
+            { 
+                return false;
+            }
+            if (senderAccount.Balance < amount || amount <= 0)
+            {
+                return false;
+            }
+
+            var receiverAccount = await bankAccountRepository
+                .FirstOrDefaultAsync(ba => ba.IBAN == receiverIBAN);
+            if (receiverAccount != null)
+            {
+                senderAccount.Balance -= amount;
+                receiverAccount.Balance += amount;
+                await bankAccountRepository.UpdateAsync(senderAccount);
+                await bankAccountRepository.UpdateAsync(receiverAccount);
+            }
+
+            return true;
         }
 
         public async Task<bool> WithdrawAsync(Guid bankAccountId, decimal amount)
