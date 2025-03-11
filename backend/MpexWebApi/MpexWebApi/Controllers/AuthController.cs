@@ -1,16 +1,11 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using MpexTestApi.Infrastructure.Data.Models;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-using MpexTestApi.Core.Services.Contracts;
-using MpexWebApi.Core.ViewModels;
-using MpexWebApi.Core.Services.Contracts;
-using MpexTestApi.Extensions;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.EntityFrameworkCore;
+using MpexTestApi.Core.Services.Contracts;
+using MpexTestApi.Extensions;
+using MpexTestApi.Infrastructure.Data.Models;
+using MpexWebApi.Core.Services.Contracts;
+using MpexWebApi.Core.ViewModels;
 
 namespace MpexTestApi.Controllers
 {
