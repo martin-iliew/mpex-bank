@@ -10,6 +10,7 @@ interface AuthProviderProps {
 export default function AuthProvider({ children }: AuthProviderProps) {
   const [token, setTokenState] = useState<string | null>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   const setUserRoleFromToken = () => {
     const decoded = decodeToken();
@@ -37,6 +38,8 @@ export default function AuthProvider({ children }: AuthProviderProps) {
         console.error("Token refresh failed", error);
         setUserRole(null);
         setTokenState(null);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -55,6 +58,7 @@ export default function AuthProvider({ children }: AuthProviderProps) {
     userRole,
     logout,
     setTokenState,
+    isLoading,
     isAuthenticated: !!token,
   };
 
