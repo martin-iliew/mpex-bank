@@ -372,5 +372,84 @@ namespace MpexWebApi.Controllers
 
             return Ok();
         }
+
+        [HttpPost("{bankAccountId}/disable-bank-account")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public async Task<IActionResult> DisableBankAccount(string bankAccountId)
+        {
+
+            if (!Guid.TryParse(bankAccountId, out var bankAccountGuid))
+            {
+                return BadRequest();
+            }
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+
+            var bankAccount = await bankAccountService.GetBankAccountAsync(bankAccountGuid);
+            if (bankAccount == null)
+            {
+                return NotFound();
+            }
+
+            if (bankAccount.UserId.Equals(userId))
+            {
+                return Forbid();
+            }
+
+            var success = await bankAccountService.DisableBankAccount(bankAccountGuid);
+            if (!success)
+            {
+                return BadRequest();
+            }
+            return Ok();
+        }
+
+        [HttpPost("{cardId}/freeze-card")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public async Task<IActionResult> FreezeCard(string cardId)
+        {
+
+            if (!Guid.TryParse(cardId, out var carGuid))
+            {
+                return BadRequest();
+            }
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+
+            var card = await bankAccountService.GetCardAsync(carGuid);
+            if (card == null)
+            {
+                return NotFound();
+            }
+
+            if (card.UserId.Equals(userId))
+            {
+                return Forbid();
+            }
+
+            var success = await bankAccountService.FreezeCard(carGuid);
+            if (!success)
+            {
+                return BadRequest();
+            }
+            return Ok();
+        }
+
     }
 }

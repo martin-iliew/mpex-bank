@@ -21,6 +21,10 @@ namespace MpexWebApi.Infrastructure.Data.Models
 
         public DateTime CreatedAt { get; set; }
 
+        public bool IsActive { get; set; } = true;
+
+        public DateTime? DisabledAt { get; set; }
+
         public virtual IEnumerable<Card> Cards { get; set; } = new List<Card>();
 
     }

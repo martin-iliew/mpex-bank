@@ -17,8 +17,9 @@ namespace MpexWebApi.Infrastructure.Data.Models
 
         public DateOnly ExpiryDate { get; set; }
 
-        public CardStatuses CardStatus { get; set; }
+        public CardStatuses CardStatus { get; set; } = CardStatuses.Active;
 
-        public DateTime CreatedAt { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
     }
 }

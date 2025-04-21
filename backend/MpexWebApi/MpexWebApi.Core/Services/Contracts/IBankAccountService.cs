@@ -23,6 +23,6 @@ namespace MpexWebApi.Core.Services.Contracts
         Task<bool> WithdrawAsync(Guid bankAccountId, decimal amount);
         Task<bool> TransferToIBAN(Guid senderBankAccountId, string receiverIBAN, decimal amount);
         Task<bool> TransferBetweenOwnAccounts(Guid senderAccountId, string receiverIBAN, decimal amount);
-        Task<bool> DisableBankAccount(Guid userId, Guid bankAccountId);
+        Task<bool> DisableBankAccount(Guid bankAccountId);
     }
 }
