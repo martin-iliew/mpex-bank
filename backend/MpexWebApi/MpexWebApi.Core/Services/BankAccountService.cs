@@ -1,5 +1,6 @@
 ﻿using CarApp.Infrastructure.Data.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using MpexTestApi.Infrastructure.Constants.Enums;
 using MpexWebApi.Core.Services.Contracts;
 using MpexWebApi.Core.ViewModels.BankAccount;
 using MpexWebApi.Core.ViewModels.Card;
@@ -28,7 +29,7 @@ namespace MpexWebApi.Core.Services
         {
             var bankAccounts = await bankAccountRepository
                 .GetAllAttached()
-                .Where(ba => ba.ApplicationUser.Id.Equals(UserId))
+                .Where(ba => ba.ApplicationUser.Id.Equals(UserId) && ba.IsActive == true)
                 .Select(ba => new AllBankAccountViewModel()
                 {
                     Id = ba.Id.ToString(),
@@ -48,7 +49,7 @@ namespace MpexWebApi.Core.Services
         {
             var bankAccounts = await cardRepository
                 .GetAllAttached()
-                .Where(c => c.BankAccount.ApplicationUser.Id.Equals(userId))
+                .Where(c => c.BankAccount.ApplicationUser.Id.Equals(userId) && c.BankAccount.IsActive == true)
                 .Select(c => new AllCardsViewModel()
                 {
                     Id = c.Id.ToString(),
@@ -89,10 +90,9 @@ namespace MpexWebApi.Core.Services
 
         public async Task<bool> CreateCardAsync(Guid bankAccountId)
         {
-            var bankAccount = await bankAccountRepository
-                .FirstOrDefaultAsync(ba => ba.Id == bankAccountId);
+            var bankAccount = await bankAccountRepository.GetByIdAsync(bankAccountId);
 
-            if (bankAccount == null)
+            if (bankAccount == null || bankAccount.IsActive == false)
             {
                 return false;
             }
@@ -103,7 +103,7 @@ namespace MpexWebApi.Core.Services
                 BankAccountId = bankAccountId,
                 ExpiryDate = GenerateExpiryDate(),
                 CreatedAt = DateTime.UtcNow,
-                CardStatus = 0,
+                CardStatus = CardStatuses.Active,
                 CardNumber = GenerateCardNumber(bankAccount.AccountNumber) ?? "xxxxxxxxxxxxxxxx",
                 CVV = GenerateCVV()
             };
@@ -116,7 +116,7 @@ namespace MpexWebApi.Core.Services
         {
             var model = await cardRepository
                 .GetAllAttached()
-                .Where(c => c.Id.ToString() == cardId.ToString())
+                .Where(c => c.Id.ToString() == cardId.ToString() && c.CardStatus == CardStatuses.Active)
                 .Select(c => new DebitCardViewModel()
                 {
                     Id = c.Id.ToString(),
@@ -135,7 +135,7 @@ namespace MpexWebApi.Core.Services
         public async Task<bool> Deposit(Guid bankAccountId, decimal amount)
         {
             var bankAccount = await bankAccountRepository.GetByIdAsync(bankAccountId);
-            if(bankAccount == null)
+            if(bankAccount == null || bankAccount.IsActive == false)
             {
                 return false;
             }
@@ -144,21 +144,55 @@ namespace MpexWebApi.Core.Services
             return true;
         }
 
-        public Task<bool> DisableBankAccount(Guid userId, Guid bankAccountId)
+        public async Task<bool> DisableBankAccount(Guid bankAccountId)
         {
-            throw new NotImplementedException();
+            var bankAccount = await bankAccountRepository.GetByIdAsync(bankAccountId);
+
+            if (bankAccount == null)
+            {
+                return false;
+            }
+            if (!bankAccount.IsActive)
+            {
+                return false;
+            }
+
+            bankAccount.IsActive = false;
+            bankAccount.DisabledAt = DateTime.UtcNow;
+
+            foreach (var card in bankAccount.Cards)
+            {
+                if (card.CardStatus != CardStatuses.Inactive)
+                {
+                    card.CardStatus = CardStatuses.Inactive;
+                }
+                await cardRepository.UpdateAsync(card);
+            }
+            await bankAccountRepository.UpdateAsync(bankAccount);
+
+            return true;
         }
 
-        public Task<bool> FreezeCard(Guid cardId)
+        public async Task<bool> FreezeCard(Guid cardId)
         {
-            throw new NotImplementedException();
+            var card = await cardRepository.GetByIdAsync(cardId);
+
+            if (card == null || card.CardStatus != CardStatuses.Active)
+            {
+                return false;
+            }
+
+            card.CardStatus = CardStatuses.Frozen;
+
+            await cardRepository.UpdateAsync(card);
+            return true;
         }
 
         public async Task<BankAccountViewModel?> GetBankAccountAsync(Guid bankAccountId)
         {
             var model = await bankAccountRepository
                 .GetAllAttached()
-                .Where(ba => ba.Id.ToString() == bankAccountId.ToString())
+                .Where(ba => ba.Id.ToString() == bankAccountId.ToString() && ba.IsActive == true)
                 .Select(ba => new BankAccountViewModel()
                 {
                     Id = ba.Id.ToString(),
@@ -186,10 +220,10 @@ namespace MpexWebApi.Core.Services
         public async Task<bool> TransferBetweenOwnAccounts(Guid senderAccountId, string receiverIBAN, decimal amount)
         {
             var senderAccount = await bankAccountRepository
-                .FirstOrDefaultAsync(ba => ba.Id == senderAccountId);
+                .FirstOrDefaultAsync(ba => ba.Id == senderAccountId && ba.IsActive == true);
 
             var receiverAccount = await bankAccountRepository
-                .FirstOrDefaultAsync(ba => ba.IBAN == receiverIBAN);
+                .FirstOrDefaultAsync(ba => ba.IBAN == receiverIBAN && ba.IsActive == true);
 
             if (senderAccount == null || receiverAccount == null)
             {
@@ -223,7 +257,7 @@ namespace MpexWebApi.Core.Services
         public async Task<bool> TransferToIBAN(Guid senderBankAccountId, string receiverIBAN, decimal amount)
         {
             var senderAccount = await bankAccountRepository
-                .FirstOrDefaultAsync(ba => ba.Id == senderBankAccountId);
+                .FirstOrDefaultAsync(ba => ba.Id == senderBankAccountId && ba.IsActive == true);
 
             if (senderAccount == null)
             { 
@@ -250,7 +284,7 @@ namespace MpexWebApi.Core.Services
         public async Task<bool> WithdrawAsync(Guid bankAccountId, decimal amount)
         {
             var bankAccount = await bankAccountRepository.GetByIdAsync(bankAccountId);
-            if (bankAccount == null)
+            if (bankAccount == null && bankAccount?.IsActive == true)
             {
                 return false;
             }
