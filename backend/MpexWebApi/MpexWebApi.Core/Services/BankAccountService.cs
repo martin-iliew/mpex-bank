@@ -1,6 +1,6 @@
 ﻿using CarApp.Infrastructure.Data.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using MpexTestApi.Infrastructure.Constants.Enums;
+using MpexWebApi.Infrastructure.Constants.Enums;
 using MpexWebApi.Core.Services.Contracts;
 using MpexWebApi.Core.ViewModels.BankAccount;
 using MpexWebApi.Core.ViewModels.Card;

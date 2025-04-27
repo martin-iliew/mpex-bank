@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace MpexTestApi.Infrastructure.Data.Models
+namespace MpexWebApi.Infrastructure.Data.Models
 {
     public class UserProfile
     {

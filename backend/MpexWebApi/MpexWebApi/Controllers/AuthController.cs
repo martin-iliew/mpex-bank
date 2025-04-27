@@ -1,13 +1,13 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using MpexTestApi.Core.Services.Contracts;
-using MpexTestApi.Extensions;
-using MpexTestApi.Infrastructure.Data.Models;
+using MpexWebApi.Core.Services.Contracts;
+using MpexWebApi.Extensions;
+using MpexWebApi.Infrastructure.Data.Models;
 using MpexWebApi.Core.Services.Contracts;
 using MpexWebApi.Core.ViewModels;
 
-namespace MpexTestApi.Controllers
+namespace MpexWebApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]

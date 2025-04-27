@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using MpexTestApi.Extensions;
+using MpexWebApi.Extensions;
 using MpexWebApi.Core.Services;
 using MpexWebApi.Core.Services.Contracts;
 using MpexWebApi.Core.ViewModels.BankAccount;

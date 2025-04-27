@@ -1,4 +1,4 @@
-﻿using MpexTestApi.Infrastructure.Data.Models;
+﻿using MpexWebApi.Infrastructure.Data.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;

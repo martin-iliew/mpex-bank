@@ -3,10 +3,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using MpexTestApi.Core.Services.Contracts;
-using MpexTestApi.Infrastructure.Constants.Enums;
-using MpexTestApi.Infrastructure.Data;
-using MpexTestApi.Infrastructure.Data.Models;
+using MpexWebApi.Core.Services.Contracts;
+using MpexWebApi.Infrastructure.Constants.Enums;
+using MpexWebApi.Infrastructure.Data;
+using MpexWebApi.Infrastructure.Data.Models;
 using MpexWebApi.Core.Services;
 using MpexWebApi.Core.Services.Contracts;
 using MpexWebApi.Core.ViewModels;
@@ -14,8 +14,8 @@ using MpexWebApi.Infrastructure.Data.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using static MpexTestApi.Infrastructure.Constants.EntityValidations.ApplicationUser;
-namespace MpexTestApi.Core.Services
+using static MpexWebApi.Infrastructure.Constants.EntityValidations.ApplicationUser;
+namespace MpexWebApi.Core.Services
 {
     public class UserService : IUserService
     {

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MpexTestApi.Infrastructure.Constants.Enums
+namespace MpexWebApi.Infrastructure.Constants.Enums
 {
     public enum AccountStatus
     {
