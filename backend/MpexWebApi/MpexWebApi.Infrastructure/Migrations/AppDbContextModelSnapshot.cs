@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using MpexTestApi.Infrastructure.Data;
+using MpexWebApi.Infrastructure.Data;
 
 #nullable disable
 
@@ -52,13 +52,13 @@ namespace MpexWebApi.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("61b83632-c800-4713-9ebe-29d3917f9d21"),
+                            Id = new Guid("cd627e7e-37f8-4880-b671-588ea5fa4c97"),
                             Name = "User",
                             NormalizedName = "USER"
                         },
                         new
                         {
-                            Id = new Guid("63e975c8-46eb-43d2-b251-5d074772d92c"),
+                            Id = new Guid("802bc44d-f483-4940-a6c4-0e1918bd6556"),
                             Name = "Administrator",
                             NormalizedName = "ADMINISTRATOR"
                         });
@@ -219,12 +219,6 @@ namespace MpexWebApi.Infrastructure.Migrations
                     b.Property<string>("ProfilePicture")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("RefreshToken")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("RefreshTokenExpiry")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
@@ -299,9 +293,15 @@ namespace MpexWebApi.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime?>("DisabledAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("IBAN")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
