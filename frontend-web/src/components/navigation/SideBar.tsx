@@ -9,11 +9,17 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarFooter,
-  SidebarRail,
 } from "@/components/ui/sidebar";
 import { Link } from "react-router-dom";
+import { Button } from "../ui/button";
+import { useAuth } from "@/hooks/useAuth";
+import { BodyExtraSmall } from "../Typography";
 
 const SidebarComponent = ({ children }: { children?: React.ReactNode }) => {
+  const { logout } = useAuth();
+  const handleLogout = () => {
+    logout();
+  };
   return (
     <Sidebar>
       <SidebarHeader className="flex h-16 justify-center pl-4">
@@ -28,17 +34,23 @@ const SidebarComponent = ({ children }: { children?: React.ReactNode }) => {
 
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Projects</SidebarGroupLabel>
+          <SidebarGroupLabel>
+            <BodyExtraSmall>Projects</BodyExtraSmall>
+          </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild variant={"outline"}>
-                  <Link to="/dashboard">Home</Link>
+                  <Link to="/dashboard">
+                    <BodyExtraSmall>Home</BodyExtraSmall>
+                  </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild variant={"outline"}>
-                  <Link to="/cards">Cards</Link>
+                  <Link to="/cards">
+                    <BodyExtraSmall>Home</BodyExtraSmall>
+                  </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
@@ -49,11 +61,12 @@ const SidebarComponent = ({ children }: { children?: React.ReactNode }) => {
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size={"lg"}>Log out</SidebarMenuButton>
+            <Button size={"lg"} className="w-full" onClick={handleLogout}>
+              Log out
+            </Button>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
-      <SidebarRail />
       {children}
     </Sidebar>
   );

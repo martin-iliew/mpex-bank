@@ -2,14 +2,14 @@ import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { jwtDecode, JwtPayload } from "jwt-decode";
 
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
+
 export interface DecodedToken extends JwtPayload {
   role: string;
 }
 let accessToken: string | null = null;
-
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
 
 export const setToken = (token: string | null): void => {
   accessToken = token;

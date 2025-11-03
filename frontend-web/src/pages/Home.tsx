@@ -1,6 +1,7 @@
 import { DisplayLarge } from "@/components/Typography";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+
 export default function HomePage() {
   const navigate = useNavigate();
   return (

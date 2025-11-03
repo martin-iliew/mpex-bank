@@ -79,7 +79,7 @@ export function CardComponent({ card }: CardProps) {
                 </div>
               </div>
 
-              <div className="h-10 w-full bg-gray-200/20" />
+              <div className="h-10 w-full bg-gray-200/20 m-0.5 font-se" />
 
               <div className="text-right text-xs text-white/80">
                 For customer service, call the number on the back of your card.

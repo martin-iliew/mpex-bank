@@ -10,7 +10,7 @@ const DisplayLarge = ({ children, className }: TypographyProps) => {
   return (
     <h1
       className={clsx(
-        "font-title text-9xl leading-tight font-black uppercase sm:text-5xl lg:text-6xl",
+        "font-title text-9xl leading-tight font-black uppercase sm:text-5xl lg:text-2xl",
         className,
       )}
     >
@@ -23,7 +23,7 @@ const TitlePage = ({ children, className }: TypographyProps) => {
   return (
     <h2
       className={clsx(
-        "font-title text-9xl font-black uppercase sm:text-5xl lg:text-6xl",
+        "font-title text-5xl font-black uppercase sm:text-5xl lg:text-6xl",
         className,
       )}
     >

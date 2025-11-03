@@ -1,5 +1,9 @@
-import SideBar from "@/components/SideBar";
-import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
+import SideBar from "@/components/navigation/SideBar";
+import {
+  SidebarProvider,
+  SidebarInset,
+  SidebarTrigger,
+} from "@/components/ui/sidebar";
 export default function DashboardLayout({
   children,
 }: {
@@ -7,10 +11,13 @@ export default function DashboardLayout({
 }) {
   return (
     <div>
-      <SidebarProvider>
+      <SidebarProvider className="bg-[#F7F7F7]">
         <SideBar />
-        <SidebarInset className="bg-neutral-100">
-          <main>{children}</main>
+        <SidebarInset className="m-3 rounded-2xl border-1 border-[#E7E8E7] bg-white">
+          <main>
+            <SidebarTrigger />
+            {children}
+          </main>
         </SidebarInset>
       </SidebarProvider>
     </div>

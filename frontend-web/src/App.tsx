@@ -1,7 +1,8 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./App.css";
-import LoginPage from "./pages/(auth)/Login";
+import LoginPage from "./pages/(auth)/login/Page";
 import DashboardPage from "./pages/(dashboard)/Dashboard";
+import RegisterPage from "./pages/(auth)/register/Page";
 import HomePage from "./pages/Home";
 import AuthGuard from "./guards/AuthGuard";
 import GuestGuard from "@/guards/GuestGuard";
@@ -17,6 +18,14 @@ const App = () => {
           element={
             <GuestGuard>
               <LoginPage />
+            </GuestGuard>
+          }
+        />
+        <Route
+          path="/register"
+          element={
+            <GuestGuard>
+              <RegisterPage />
             </GuestGuard>
           }
         />
