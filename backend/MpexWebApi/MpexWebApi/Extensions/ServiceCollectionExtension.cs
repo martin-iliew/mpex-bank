@@ -3,16 +3,18 @@ using CarApp.Infrastructure.Data.Repositories.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using MpexTestApi.Core.Services.Contracts;
-using MpexTestApi.Infrastructure.Data;
-using MpexTestApi.Infrastructure.Data.Models;
+using MpexWebApi.Core.Services.Contracts;
+using MpexWebApi.Core.ViewModels.Admin;
 using MpexWebApi.Infrastructure.Constants.Enums;
+using MpexWebApi.Infrastructure.Data;
+using MpexWebApi.Infrastructure.Data.Models;
 using System.Reflection;
 using System.Text;
+using static MpexWebApi.Infrastructure.Constants.EntityValidations.Admin;
 
-
-namespace MpexTestApi.Extensions
+namespace MpexWebApi.Extensions
 {
     public static class ServiceCollectionExtension
     {
@@ -76,8 +78,6 @@ namespace MpexTestApi.Extensions
 
             return services;
         }
-
-
 
         public static IServiceCollection AddApplicationIdentity(this IServiceCollection services, IConfiguration config)
         {
@@ -167,5 +167,56 @@ namespace MpexTestApi.Extensions
                 services.AddScoped(serviceInterfaceType, serviceType);
             }
         }
+
+        public static async Task SeedAdminAsync(this IApplicationBuilder app)
+        {
+            using var scope = app.ApplicationServices.CreateScope();
+            var serviceProvider = scope.ServiceProvider;
+
+            var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+            var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
+            var dbContext = serviceProvider.GetRequiredService<AppDbContext>();
+            var adminSettings = serviceProvider.GetRequiredService<IOptions<AdminUserSettings>>().Value;
+
+            if (!await roleManager.RoleExistsAsync(AdminRoleName))
+            {
+                await roleManager.CreateAsync(new IdentityRole<Guid>(AdminRoleName));
+            }
+
+            var adminUser = await userManager.FindByEmailAsync(adminSettings.Email);
+            if (adminUser == null)
+            {
+                adminUser = new ApplicationUser
+                {
+                    Id = Guid.NewGuid(),
+                    UserName = adminSettings.Email,
+                    Email = adminSettings.Email,
+                    EmailConfirmed = true,
+                    PhoneNumber = adminSettings.PhoneNumber,
+                    AccountStatus = AccountStatus.Active,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow,
+                    UserProfile = new UserProfile
+                    {
+                        Id = Guid.NewGuid(),
+                        FirstName = adminSettings.FirstName,
+                        LastName = adminSettings.LastName,
+                        DateOfBirth = adminSettings.DateOfBirth
+                    }
+                };
+
+                var result = await userManager.CreateAsync(adminUser, adminSettings.Password);
+                if (!result.Succeeded)
+                {
+                    throw new Exception(string.Join("; ", result.Errors.Select(e => e.Description)));
+                }
+
+                await userManager.AddToRoleAsync(adminUser, AdminRoleName);
+
+                dbContext.UserProfiles.Add(adminUser.UserProfile!);
+                await dbContext.SaveChangesAsync();
+            }
+        }
+
     }
 }

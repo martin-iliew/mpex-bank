@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using MpexTestApi.Infrastructure.Constants.Enums;
+using MpexWebApi.Infrastructure.Constants.Enums;
 using MpexWebApi.Infrastructure.Data.Models;
 using System;
 using System.Collections.Generic;
@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MpexTestApi.Infrastructure.Data.Models
+namespace MpexWebApi.Infrastructure.Data.Models
 {
     public class ApplicationUser : IdentityUser<Guid>
     {

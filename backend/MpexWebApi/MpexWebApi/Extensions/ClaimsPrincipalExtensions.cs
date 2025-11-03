@@ -1,7 +1,7 @@
 ﻿using System.Security.Claims;
-using static MpexTestApi.Infrastructure.Constants.EntityValidations.Admin;
+using static MpexWebApi.Infrastructure.Constants.EntityValidations.Admin;
 
-namespace MpexTestApi.Extensions
+namespace MpexWebApi.Extensions
 {
     public static class ClaimsPrincipalExtensions
     {

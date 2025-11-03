@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using MpexTestApi.Infrastructure.Data.Models;
+using MpexWebApi.Infrastructure.Data.Models;
 using MpexWebApi.Core.ViewModels;
 
-namespace MpexTestApi.Core.Services.Contracts
+namespace MpexWebApi.Core.Services.Contracts
 {
     public interface IUserService
     {

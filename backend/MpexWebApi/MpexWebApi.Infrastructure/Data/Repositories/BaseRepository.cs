@@ -1,6 +1,6 @@
 ﻿using CarApp.Infrastructure.Data.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using MpexTestApi.Infrastructure.Data;
+using MpexWebApi.Infrastructure.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Server.Kestrel.Https;
 using Microsoft.OpenApi.Models;
-using MpexTestApi.Extensions;
+using MpexWebApi.Core.ViewModels.Admin;
+using MpexWebApi.Extensions;
 using System.Net;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,6 +14,7 @@ builder.Services.AddApplicationDbContext(builder.Configuration);
 builder.Services.AddApplicationIdentity(builder.Configuration);
 builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddApplicationServices();
+builder.Services.Configure<AdminUserSettings>(builder.Configuration.GetSection("AdminUserSettings"));
 
 builder.Services.AddCors(options =>
 {
@@ -70,12 +72,12 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
 app.UseHttpsRedirection();
 app.UseCors("AllowSpecificOrigin");
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
+
+await app.SeedAdminAsync();
 
 await app.RunAsync();

@@ -1,4 +1,4 @@
-﻿using MpexTestApi.Infrastructure.Data.Models;
+﻿using MpexWebApi.Infrastructure.Data.Models;
 using MpexWebApi.Infrastructure.Constants.Enums;
 using System.ComponentModel.DataAnnotations.Schema;
 
