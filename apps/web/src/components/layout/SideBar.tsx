@@ -13,7 +13,7 @@ import {
 import { Link } from "react-router-dom";
 import { Button } from "../ui/button";
 import { useAuth } from "@/hooks/useAuth";
-import { BodyExtraSmall } from "../Typography";
+import { BodyExtraSmall } from "../common/Typography";
 
 const SidebarComponent = ({ children }: { children?: React.ReactNode }) => {
   const { logout } = useAuth();

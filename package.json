@@ -1,5 +1,5 @@
 {
-  "name": "mpex",
+  "name": "mpex-banks",
   "private": true,
   "scripts": {
     "build": "turbo run build",

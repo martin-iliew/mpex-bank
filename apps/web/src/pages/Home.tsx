@@ -1,4 +1,4 @@
-import { DisplayLarge } from "@/components/Typography";
+import { DisplayLarge } from "@/components/common/Typography";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 

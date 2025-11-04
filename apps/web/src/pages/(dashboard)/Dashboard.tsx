@@ -8,7 +8,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { CardComponent } from "@/components/Card";
 import { useState } from "react";
-import { TitlePage } from "@/components/Typography";
+import { TitlePage } from "@/components/common/Typography";
 export default function DashboardPage() {
   const [selectedAccountId, setSelectedAccountId] = useState<string>("");
   const {
