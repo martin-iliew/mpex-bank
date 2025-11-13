@@ -1,5 +1,5 @@
 {
-  "name": "mpex-banks",
+  "name": "mpex-bank",
   "private": true,
   "scripts": {
     "build": "turbo run build",
@@ -13,7 +13,7 @@
     "turbo": "^2.6.0",
     "typescript": "5.9.2"
   },
-  "packageManager": "pnpm@9.0.0",
+  "packageManager": "pnpm@10.0.0",
   "engines": {
     "node": ">=18"
   }
