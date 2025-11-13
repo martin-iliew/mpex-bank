@@ -1,4 +1,4 @@
-import SideBar from "@/components/navigation/SideBar";
+import SideBar from "@/components/layout/SideBar";
 import {
   SidebarProvider,
   SidebarInset,
@@ -13,7 +13,7 @@ export default function DashboardLayout({
     <div>
       <SidebarProvider className="bg-[#F7F7F7]">
         <SideBar />
-        <SidebarInset className="m-3 rounded-2xl border-1 border-[#E7E8E7] bg-white">
+        <SidebarInset className="m-3 rounded-2xl border-[#E7E8E7] bg-white">
           <main>
             <SidebarTrigger />
             {children}

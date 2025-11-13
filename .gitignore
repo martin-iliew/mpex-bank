@@ -499,3 +499,5 @@ $RECYCLE.BIN/
 .nx/cache
 .nx/workspace-data
 vite.config.*.timestamp*
+
+.turbo
